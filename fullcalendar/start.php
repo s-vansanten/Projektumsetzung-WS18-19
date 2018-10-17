@@ -15,6 +15,7 @@
 				center:'title',
 				right:'month,agendaWeek,agendaDay'
 			},
+			defaultView: 'agendaWeek',
 			events: [
 				{
 					title: 'Test',
