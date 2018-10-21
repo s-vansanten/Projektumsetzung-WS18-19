@@ -1,0 +1,31 @@
+Studgang;Sem;Stud-Gr;Modul;Art;SWS;Anrede ModulB;Modulbeauftragte/r;Status;Anrede;Titel;Vorname;Nachname;HS;Raum;LV-Start;Sondertermine;Mo B;Mo E;Di B;Di E;Mi B;Mi E;Do B;Do E;Fr B;Fr E;Sa B;Sa E
+VI;2;1;M 06 IT-Infrastruktur II;LV;3;Frau;Elkina;LB;Frau;Dr.;Isabell;Heuber;0;s. Finca;;Mi 18.04., Fr 20.04., 27.04., 04.05. Sa 21.04., 05.05.;;;;;08.00;16.00;;;08.00;16.00;09.00;17.00
+VI;2;1;M 07 E-Government I;LV;2;Frau;Elkina;LB;Herr;Dr.;André;Göbel;0;6A 123;;11.04., 25.04., 02.05., 16.05.;;;;;09.00;15.00;;;;;;
+VI;2;1;M 07 E-Government I;LV;2;;;LB;Frau;Dr.;Eva-Charlotte;Proll;0;6A 123;;Mo: 28.05., 11.06., Fr: 08.06., 20.07., 27.07.;09.00;12.00;;;;;;;09.00;15.00;;
+VI;2;;M 08 Betriebssysteme;LV, PCÜ;3;;;0;0;0;0;xxx;0;;;;;;;;;;;;;;;
+VI;2;1;M 08 Betriebssysteme;LV;1;Frau;Elkina;LB;Herr;0;Arthur;Zimmermann;0;6A 123;;07.05., 14.05.,  04.06., 18.06., 02.07., 16.07.,  ;09.30;12.00;;;;;;;;;;
+VI;2;1;M 08 Betriebssysteme;LV;1;Frau;Elkina;LB;Herr;0;Daniel;Müller;0;6A 123;;05.04., 19.04., 03.05.;;;;;;;15.00;17.00;;;;
+VI;2;1a;M 08 Betriebssysteme ;PCÜ;2;Frau;Elkina;LB;Herr;0;Arthur;Zimmermann;0;6A 123;;07.05., 04.06., 18.06., 02.07., 16.07.,   ;12.00;16.00;;;;;;;;;;
+VI;2;1a;M 08 Betriebssysteme ;PCÜ;2;Frau;Elkina;LB;Herr;0;Daniel;Müller;0;6A 123;;12.04., 26.04., 03.05. ;;;;;;;17.00;21.00;;;;
+VI;2;1b;M 08 Betriebssysteme ;PCÜ;2;Frau;Elkina;LB;Herr;0;Arthur;Zimmermann;0;6A 123;;14.05., 28.05., 11.06., 25.06., 09.07., 23.07., ;12.00;16.00;;;;;;;;;;
+VI;2;1b;M 08 Betriebssysteme ;PCÜ;2;Frau;Elkina;LB;Herr;0;Daniel;Müller;0;6A 123;;05.04., 19.04., 03.05.;;;;;;;17.00;21.00;;;;
+VI;2;;M 09  Programmierung und Softwareentwicklung II;LV, PCÜ;4;;;0;0;0;0;xxx;0;;;;;;;;;;;;;;;
+VI;2;1;M 09 Programmierung und Softwareentwicklung II;LV;2;Frau;Elkina;Prof;Frau;Prof. Dr.;Margarita ;Elkina;HWR;6A 123;ab 14. KW;;;;12.00;14.00;;;;;;;;
+VI;2;1a;M 09 Programmierung und Softwareentwicklung II ;PCÜ;2;Frau;Elkina;Prof;Frau;Prof. Dr.;Margarita ;Elkina;HWR;6A 123;ab 14. KW;;;;10.00;12.00;;;;;;;;
+VI;2;1b;M 09 Programmierung und Softwareentwicklung II ;PCÜ;2;Frau;Elkina;Prof;Frau;Prof. Dr.;Margarita ;Elkina;HWR;6A 123;ab 14. KW;;;;14.00;16.00;;;;;;;;
+VI;2;;M 10  Zivilrecht und IT-Recht;LV;6;;;0;0;0;0;xxx;0;;;;;;;;;;;;;;;
+VI;2;1;M 10 Schwerpunkt: IT-Recht;LV;2;Frau;Busch;LB;Herr;Dr.;Thomas;Hartmann;0;6B 253;;13.04., 18.05., 01.06., 15.06., 29.06., 13.07.;;;;;;;;;08.00;14.00;;
+VI;2;1;M 10 Schwerpunkt: Zivilrecht;LV;4;Frau;Busch;LB;Herr;0;Manuel;Miller;0;6A 326;ab 15. KW, 14-tägig;nicht 09.06., dafür 16.06.;;;;;;;;;;;10.00;17.00
+VI;4;;M 14  Datenbanken I;LV, Ü;4;;;0;0;0;0;xxx;0;;;;;;;;;;;;;;;
+VI;4;1;M 14 Datenbanken I;LV;2;Frau;Lück-Schneider;Prof;Frau;Prof. Dr.;Dagmar;Lück-Schneider;HWR;6A 124;ab 14. KW;;;;10.00;12.00;;;;;;;;
+VI;4;1a;M 14 Datenbanken I;PCÜ;2;Frau;Lück-Schneider;Prof;Frau;Prof. Dr.;Dagmar;Lück-Schneider;HWR;6A 124;ab 14. KW;;;;12.00;14.00;;;;;;;;
+VI;4;1b;M 14 Datenbanken I;PCÜ;2;Frau;Lück-Schneider;Prof;Frau;Prof. Dr.;Dagmar;Lück-Schneider;HWR;6A 124;ab 14. KW;;;;14.00;16.00;;;;;;;;
+VI;4;1;M 17 BWL II;LV;4;Frau;Adam;GastD;Herr;Dr.;Martin;Dastig;HWR;6B 253;ab 15. KW;;17.00;21.00;;;;;;;;;;
+VI;4;1;M 18 Verwaltungswissenschaften II;LV;4;;N.N.;LB;Herr;Dr.;Jens;Tessmann;HWR;6B 253;ab 15. KW;;13.00;17.00;;;;;;;;;;
+VI;4;1;M 19a Rechtsvertiefung: Verwaltungsrecht;PS;4;Frau;Bautze;GastD;Herr;Dr.;Thomas;Groh;HWR;6A 122;ab 14. KW;;;;16.00;20.00;;;;;;;;
+VI;4;1;M 19b Rechtsvertiefung: Zivilrecht;PS;4;Frau;Bautze;LB;Frau;0;Sandra;Walocha;0;6A 019;ab 15. KW;;;;;;;;18.00;21.00;;;;
+VI;4;1a;M 20 Projektdesign;PS;4;Frau;Elkina;Prof;Frau;Prof. Dr.;Dagmar;Lück-Schneider;HWR;6A 124;ab 14. KW;;;;;;10.00;14.00;;;;;;
+VI;4;1b;M 20 Projektdesign;PS;4;Frau;Elkina;Prof;Frau;Prof. Dr.;Margarita ;Elkina;HWR;6A 123;ab 14. KW;;;;;;10.00;14.00;;;;;;
+VI;6;1;M 26 Verwaltungsinformatik in der Praxis;Ü;4;Frau;Elkina;Prof;Frau;Prof. Dr.;Margarita ;Elkina;HWR;;;04.05., 01.06., 29.06., 27.07., 25.09., 26.09., 27.09.;;;10.00;17.00;10.00;17.00;10.00;17.00;10.00;17.00;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Module mit mehreren Schwerpunkten / Teilung LV und Übung;;;;;;;;;;;;;;;;;;;;;;;;;
