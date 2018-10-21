@@ -138,31 +138,39 @@
 	}
 	
 	filterArray($csv);
-	#print_r ($csv);
 	
 	$year = "2018";
-	$posts = array();
-	#json-Array erstellen
-	#WICHTIGE Anmerkung: Anscheinend kommt es zu Problemen beim Encoden, wenn die letzte Zeile der csv-Datei mit eingelesen wird. Dort gibt es ein Ue, das den Vorgang zerstört.
-	#Es müsste somit eine Anpassung bei dewr Filterung der Datei erfolgen.
-	for ($row = 0; $row < count($csv)-2; $row++){
-		$kw_start = $csv[$row]['LV-Start'];
-		if($kw_start != NULL){
-			$title = $csv[$row]['Modul'];
-			$start_time	= setTimestamp($row, $kw_start, "1");
-			$end_time = setTimestamp($row, $kw_start, "2");			
-			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time);
-		}	
+	
+	function create_json(){
 		
+		global $csv;
+		
+		$posts = array();
+		#json-Array erstellen
+		#WICHTIGE Anmerkung: Anscheinend kommt es zu Problemen beim Encoden, wenn die letzte Zeile der csv-Datei mit eingelesen wird. Dort gibt es ein Ue, das den Vorgang zerstört.
+		#Es müsste somit eine Anpassung bei dewr Filterung der Datei erfolgen.
+		for ($row = 0; $row < count($csv)-2; $row++){
+			$kw_start = $csv[$row]['LV-Start'];
+			if($kw_start != NULL){
+				$title = $csv[$row]['Modul'];
+				$start_time	= setTimestamp($row, $kw_start, "1");
+				$end_time = setTimestamp($row, $kw_start, "2");			
+				$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time);
+			}			
+		}
+		
+		$fp = fopen('test.json','w');
+		fwrite($fp, json_encode($posts));
+		fclose($fp);
 	}
-	
-	
-	// print_r($posts);
-	// print_r("<br />\n");
-	
-	$fp = fopen('test.json','w');
-	fwrite($fp, json_encode($posts));
-	fclose($fp);
+
+	if(isset($_POST["ausfuehren"])){
+		create_json();
+	}
 ?>
+
+<form action="json.php" method="post">
+   <input type="submit" name="ausfuehren" value="JSON erstellen"/>
+</form>
 </body>
 </html>
