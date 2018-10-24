@@ -65,22 +65,32 @@
         }
       }
       $array = $arr_sl;
-      #print_r ($array);
     }
 	
+	#Funktion zur Setzung eines Timestamp anhand der Übergabe der Woche und des Tages
+	#Input: $row - Reihe (somit Modul)
+	#		$week - Wochennummer als String (muss nicht zwinged übergeben werden, da der Wert auch durch "$csv[$row]['LV-Start']" abgerufen werden kann
+	#		$start_or_end - Variable (Wert 1 oder 2, kann auf true/false angepasst werden), der bestimmt, ob die Startzeit- oder Endzeit-Spalte zur Berechnugn des Timestamps verwendet wird
 	function setTimestamp ($row, $week, $start_or_end){		
 		global $year, $csv;
 		
+		#Extrahieren von Zahlen aus dem String
 		$week_no = (float) filter_var($week, FILTER_SANITIZE_NUMBER_FLOAT);
+		#Sollten die Zahl mehr als zwei Zeichen haben, werden alle Ziffern außer die ersten beiden gelöscht
+		#Dies kommt vor, wenn außer der Kalenderwoche auch noch Information zum Turnus (bei unser CSV 14-Tägigkeit) in der Zelle enthalten sind ((1 Jahr = 52,14 Wochen)
 		if(strlen((string)$week_no) != 2){
 			$week_no = substr($week_no, 0, 2);
 		}
 		
+		#Berechnung des Beginn einer Kalenderwoche, Montags 0:00 Uhr
 		$week_start = new DateTime();
 		$week_start->setISODate($year,$week_no);
 		
+		#Umformatierung in UNIX-Timestamp zur einfachen Aufaddierung von Sekunden
 		$date = strtotime($week_start->format('Y-m-d'));
 		
+		#Bestimmung, welche Spalte mit Startzeiten einen Wert enthält
+		#$week_day beinhaltet wieviele Tage nach Montag der Timestamp gesetz werden soll
 		if($csv[$row]['Mo B'] != NULL){
 			$week_day = "0";
 			if($start_or_end == "1"){
@@ -125,28 +135,39 @@
 			}
 		}
 		
+		#Splitten der Zahl aus der Zeitspalte
+		#aus XX.YY wird [0]=XX und [1]=YY
 		$time_splited = explode(".", $time);
 		
-		
+		#Addieren von (Tage nach Montag*Sekunden pro Tag) auf den Timestamp
 		$date += $week_day*86400;
+		#Addieren von (Stunde*Sekunden pro Stunde) auf den Timestamp
 		$date += $time_splited[0]*3600;
+		#Addieren von (Minuten*Sekunden pro Minute) auf den Timestamp
 		$date += $time_splited[1]*60;		
 		
+		#Umformatierung des UNIX-Timestamp in ISO8601-Timestamp-Format
+		#Es gab Probleme bei der Anzeige im Fullcalender, wenn das UNIX-Timestamp-Format gewählt wurde
 		$date = date(DATE_ISO8601, $date);		
 		
+		#Rückgabe des Timestamps
 		return $date;
 	}
 	
 	filterArray($csv);
 	
+	#Jahr - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
 	$year = "2018";
+	#Vorlesungszeit-Ende - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
 	$end_lecture_time = "2018-07-28";
 	//28. Juli 2018 
 	
+	#Funktion zur Erstellung einer JSON-Datei
 	function create_json(){
 		
 		global $csv, $year;
 		
+		#Herausfiltern, welche Semester alle in der CSV-Datei vertreten sind
 		$semesters = array();
 		foreach ($csv as $key => $values){
 			if ( !(in_array($values['Sem'], $semesters)) && $values['Sem'] != NULL){
@@ -154,12 +175,14 @@
 			}
 		}
 		
+		#Aufruf von Unterfunktion zur Erstellung einer JSON-Datei für jedes vertretene Semester
 		foreach ($semesters as $values){
 			create_json_semester($values);
 		}
 		
 	}
 	
+	#Funktion zur Erstellung einer JSON-Datei für ein bestimmtes Semester
 	function create_json_semester($semester){
 		
 		global $csv, $year;
@@ -181,24 +204,31 @@
 		}
 		
 		$posts = create_returning($posts);
-		print_r($posts);
 		
+		#Routine zum Erstellen einer JSON-Datei
 		$file_name = 'semester_'.$year.'_'.$semester.'.json';
 		$fp = fopen($file_name,'w');
 		fwrite($fp, json_encode($posts));
 		fclose($fp);
 	}
 	
+	#Funktion zur Erstellung von wöchentlichen Terminen
+	#Input: $posts - Arrays aus Ersttermin-Events
+	#Output: $returning_posts - Array aus Events vom Beginn bis zum Ende des Semesters
 	function create_returning($posts){
 		
+		#Timestamp-Variable, welche das Ende der Vorlesungszeit setzt
 		global $end_lecture_time;
 		
+		#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format
 		$end_lecture_time = strtotime($end_lecture_time);
 		
 		$returning_posts = array();
 		foreach($posts as $values){
-						
+			
+			#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format			
 			$modul_start_date = strtotime($values['start']);
+			#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format
 			$modul_end_date = strtotime($values['end']);
 			$title = $values['title'];
 			
@@ -213,6 +243,7 @@
 		return $returning_posts;
 	}
 
+	#Was passiert, wenn der Button gedrückt wird
 	if(isset($_POST["ausfuehren"])){
 		create_json();
 	}
