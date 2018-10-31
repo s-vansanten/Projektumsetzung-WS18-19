@@ -1,0 +1,122 @@
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	margin:0; 
+	padding:0;
+	background-image: url(../test/images/background.jpg);
+	background-position: center center; 
+	background-attachment: fixed;
+	
+}
+
+	/**Navigation**/ 
+navigation{
+	position: fixed;
+	width:100%;
+	background-color: rgba(255,255,255,0.85);
+	bottom:0;
+	left: 0; 
+	display: block;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+	z-index: 100;
+}
+
+	/**Logo**/
+logo{
+	background-image:url(../Test/images/logo.svg);
+	background-repeat:no-repeat;
+	background-size:100% auto;
+	background-position:center center;
+	width:40%;
+	height:80%;
+	position:absolute;
+	left:30%;
+	top:0;
+	display:block; 
+}
+
+nav, nav > ul {
+  margin: 0;
+  padding: 0;
+} 
+
+nav  li {
+  list-style:none;
+  font-size: 1.5em;  
+  position: relative;
+  margin: 0 0 .2em 0; 
+  padding: 0;
+  width: 12em;
+}
+
+nav ul ul {
+  position: absolute;
+  top: -0.6em; 
+  left: 10em;
+  font: 0/0 serif;/* Unternavigation ausblenden */
+  z-index: -1;
+  transition: font 0.5s;
+}
+
+  nav ul li:hover ul,
+  nav ul a:focus ~ ul   {
+    font: inherit;
+    z-index: auto;                   /*  Unternavigation einblenden */
+  }
+
+@media (min-width: 45em) {
+  nav li {
+	font-size: 1em;
+  }  
+}
+
+nav a {
+  display: block;
+  padding: 0.4em;
+  text-decoration: none; 
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid lightgrey;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px white inset;
+  color: black; 
+  background-color: lightgrey; 
+  transition: all .25s ease-in;	  
+}
+
+nav li[aria-current] a {
+  background-color: lightred; 
+  color: black;
+}
+	
+nav a:focus,
+nav a:hover,
+nav li  a:focus,
+nav li  a:hover {    
+  color: lightgrey; 
+  background-color: black;
+}	
+button {
+display: block;
+  padding: 0.4em;
+  text-decoration: none; 
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid firebrick;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px white inset; 
+  transition: all .25s ease-in;	
+   color: black; 
+  background-color: firebrick;
+}
+  /* Gestaltung, wenn Button mit Maus oder Tastatur ausgewählt ist */
+button:hover,
+button:focus {
+  ...
+}
+  /* Gestaltung, wenn Button gedrückt ist */
+button:active {
+  ...
+}
+  
