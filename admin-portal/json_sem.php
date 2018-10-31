@@ -206,7 +206,7 @@
 		$posts = create_returning($posts);
 		
 		#Routine zum Erstellen einer JSON-Datei
-		$file_name = 'semester_'.$year.'_'.$semester.'.json';
+		$file_name = $csv[$row]['Studgang'].'_'.$year.'_'.$semester.'.json';
 		$fp = fopen($file_name,'w');
 		fwrite($fp, json_encode($posts));
 		fclose($fp);
