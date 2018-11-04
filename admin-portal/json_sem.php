@@ -1,10 +1,13 @@
 <html>
 <head>
-	 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">	
 </head>
 <body>
 <?php
+		
+	ini_set("allow_url_fopen", 1);
+	ini_set('max_execution_time', 300);
+	
 	#Definieren des Dateinamen
     $fileName = 'excel.csv';
     #Einlesen der Datei in ein Array
@@ -194,6 +197,11 @@
 	#Vorlesungszeit-Ende - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
 	$end_lecture_time = "2018-07-28";
 	//28. Juli 2018
+	#Feiertage-Array
+	$feiertage = array();
+	#Vorlesungsfreie Zeit - wird später durch Admin-Eingabe gesetzt
+	$lecture_free_time_start = "2018-07-02";
+	$lecture_free_time_end = "2018-07-08";
 	
 	#https://stackoverflow.com/questions/4128323/in-array-and-multidimensional-array
 	function in_array_r($needle, $haystack, $strict = false) {
@@ -211,7 +219,22 @@
 		#Globale Variablen
 		#$csv - Array der Module, aus CSV importiert und formatiert
 		#$year - Jahr
-		global $csv, $year;
+		#$feiertage - Feiertage für Berlin
+		global $csv, $year, $feiertage;		
+
+		#Abruf von Feiertagen
+		#Info: https://feiertage-api.de/
+		$feiertage_json = file_get_contents("http://feiertage-api.de/api/?jahr=2018&nur_land=BE");
+		#Decodierung der JSON-Datei
+		$feiertage_array = json_decode($feiertage_json, true);	
+
+		#TODO: Anhand von $feiertage_array können Tages-Events erstellt werden, damit ein Feiertag im Kalender angezeigt wird
+		#Jedoch beachten kein Ostersonntag, Pfingstsonntag, Heiligabend, Silvester in den Daten vorhanden
+		
+		#Extrahieren, der Datums-Informationen
+		foreach ($feiertage_array  as $key => $values){
+			array_push($feiertage, $values['datum']);			
+		}
 		
 		#Herausfiltern, welche Studiengänge und dazugehörige Semester alle in der CSV-Datei vertreten sind
 		$entries = array();
@@ -278,10 +301,12 @@
 	function create_returning($entry, $turnus){
 		
 		#Timestamp-Variable, welche das Ende der Vorlesungszeit setzt
-		global $end_lecture_time;		
+		global $end_lecture_time, $lecture_free_time_start, $lecture_free_time_end, $feiertage;
 		
 		#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format
 		$end_lecture_time_unix = strtotime($end_lecture_time);
+		$lecture_free_time_start_unix = strtotime($lecture_free_time_start);
+		$lecture_free_time_end_unix = strtotime($lecture_free_time_end);
 		
 		#Array zum Abspeichern der Event-Einträge		
 		$returning_posts = array();
@@ -294,9 +319,12 @@
 			
 		while($end_lecture_time_unix > $modul_start_date){
 				
-			#TODO: Check von Feiertagen und vorlesungsfreier Zeit im Semester (Weihnachten)
 			#TODO: Check von Anpassungen des Turnus durch Sondertermin-Einschränkung
-			$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date));
+			
+			#Check von Feiertagen & Check vorlesungsfreier Zeit
+			if(!in_array(date("Y-m-d", $modul_start_date), $feiertage) && !($modul_start_date>$lecture_free_time_start_unix && $modul_start_date<$lecture_free_time_end_unix+86400)){
+				$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date));				
+			}			
 			
 			#Erhöhung des Timestamp um (Sekunden pro Woche)*Turnus
 			$modul_start_date += 604800*$turnus;
@@ -315,7 +343,8 @@
 		#Globale Variablen
 		#$csv - Array der Module, aus CSV importiert und formatiert
 		#$year - Jahr
-		global $csv, $year;
+		#$feiertage - Feiertage für Berlin
+		global $csv, $year, $feiertage;
 		
 		#Array zum Abspeichern der Termine
 		$sondertermine_array = array();
