@@ -203,10 +203,11 @@
 	$lecture_free_time_start = "2018-07-02";
 	$lecture_free_time_end = "2018-07-08";
 	
+	#Angelehnt an
 	#https://stackoverflow.com/questions/4128323/in-array-and-multidimensional-array
-	function in_array_r($needle, $haystack, $strict = false) {
-		foreach ($haystack as $item) {
-			if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+	function in_array_r($needle, $haystack){
+		foreach ($haystack as $item){
+			if($item['Studgang'] == $needle['Studgang'] && $item['Sem'] == $needle['Sem']){
 				return true;
 			}
 		}
@@ -224,6 +225,7 @@
 
 		#Abruf von Feiertagen
 		#Info: https://feiertage-api.de/
+		#Alternativ https://www.php.de/forum/webentwicklung/php-einsteiger/1470253-feiertage-ermitteln
 		$feiertage_json = file_get_contents("http://feiertage-api.de/api/?jahr=2018&nur_land=BE");
 		#Decodierung der JSON-Datei
 		$feiertage_array = json_decode($feiertage_json, true);	
@@ -239,7 +241,7 @@
 		#Herausfiltern, welche Studiengänge und dazugehörige Semester alle in der CSV-Datei vertreten sind
 		$entries = array();
 		foreach ($csv as $key => $values){
-			if ( !(in_array_r(array($values['Studgang'], $values['Sem']), $entries)) && $values['Studgang'] != NULL){
+			if ( !(in_array_r(array('Studgang'=>$values['Studgang'], 'Sem'=>$values['Sem']), $entries)) && $values['Studgang'] != NULL){
 				array_push($entries, array('Studgang'=>$values['Studgang'], 'Sem'=>$values['Sem']));
 			}
 		}
@@ -252,6 +254,8 @@
 	
 	#Funktion zur Erstellung einer JSON-Datei für ein bestimmtes Semester
 	function create_json_semester($stud_sem){
+		
+		echo '###START: create_json_semester für Semester '.$stud_sem['Sem'].' von Studgang '.$stud_sem['Studgang'].'<br/>';
 		
 		#Globale Variablen
 		#$csv - Array der Module, aus CSV importiert und formatiert
@@ -270,7 +274,13 @@
 					$title = $csv[$row]['Modul'];
 					$start_time	= setTimestamp($row, $kw_start, NULL, "1");
 					$end_time = setTimestamp($row, $kw_start, NULL, "2");
-					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time);
+					#Abfragen, ob auch in der Sondertermin-Spalte ein Wert steht
+					if($csv[$row]['Sondertermine'] != NULL){
+						$sonder_catch = $csv[$row]['Sondertermine'];
+					}else{
+						$sonder_catch = NULL;
+					}
+					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch);
 					#Fall: Extra-Info steht in LV-Start, hier Turnus
 					if(strlen((string)(float) filter_var($kw_start, FILTER_SANITIZE_NUMBER_FLOAT)) != 2){
 						$posts = array_merge($posts, create_returning($modul_entry_start, 2));
@@ -292,6 +302,10 @@
 		$fp = fopen($file_name,'w');
 		fwrite($fp, json_encode($posts));
 		fclose($fp);
+		
+		echo '###ENDE: create_json_semester für Semester '.$stud_sem['Sem'].' von Studgang '.$stud_sem['Studgang'].'<br/>';
+		echo '<br/>';
+		echo '<br/>';
 	}
 	
 	#Funktion zur Erstellung von wöchentlichen oder mehr-wöchentlichen Terminen
@@ -300,8 +314,11 @@
 	#Output: 	$returning_posts - Array aus Events vom Beginn bis zum Ende des Semesters
 	function create_returning($entry, $turnus){
 		
+		echo '<br/>';
+		echo 'create_returning für '.$entry['title'].' mit Turnus '.$turnus.'<br/>';
+		echo '<br/>';
 		#Timestamp-Variable, welche das Ende der Vorlesungszeit setzt
-		global $end_lecture_time, $lecture_free_time_start, $lecture_free_time_end, $feiertage;
+		global $end_lecture_time, $lecture_free_time_start, $lecture_free_time_end, $feiertage, $year;
 		
 		#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format
 		$end_lecture_time_unix = strtotime($end_lecture_time);
@@ -318,12 +335,36 @@
 		$title = $entry['title'];
 			
 		while($end_lecture_time_unix > $modul_start_date){
-				
+			
 			#TODO: Check von Anpassungen des Turnus durch Sondertermin-Einschränkung
 			
 			#Check von Feiertagen & Check vorlesungsfreier Zeit
 			if(!in_array(date("Y-m-d", $modul_start_date), $feiertage) && !($modul_start_date>$lecture_free_time_start_unix && $modul_start_date<$lecture_free_time_end_unix+86400)){
-				$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date));				
+				#Check für Anpassung von Terminen durch Sondertermin-Spalte
+				#nicht 09.06., dafür 16.06.
+				if($entry['sonder_catch'] != NULL){
+					$sonder_catch_entries;
+					preg_match_all('/nicht +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', utf8_encode($entry['sonder_catch']) ,$sonder_catch_entries[0]);
+					preg_match_all('/dafür +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', utf8_encode($entry['sonder_catch']) ,$sonder_catch_entries[1]);
+					$sonder_catch_entries[0] = $sonder_catch_entries[0][0];
+					$sonder_catch_entries[1] = $sonder_catch_entries[1][0];
+					for($i = 0; $i < count($sonder_catch_entries[0]); $i++){
+						$sonder_catch_entries[0][$i] = preg_replace('/nicht /', '', $sonder_catch_entries[0][$i]);
+					}
+					for($i = 0; $i < count($sonder_catch_entries[1]); $i++){
+						$sonder_catch_entries[1][$i] = preg_replace('/dafür /', '', $sonder_catch_entries[1][$i]);
+					}					
+					
+					for($i = 0; $i<count($sonder_catch_entries[0]); $i++){
+						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries[0][$i].".".$year))){
+							$new_modul_start_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_start_date));
+							$new_modul_end_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_end_date));
+							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date));
+						}
+					}
+				}else{
+					$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date));
+				}								
 			}			
 			
 			#Erhöhung des Timestamp um (Sekunden pro Woche)*Turnus
@@ -338,13 +379,17 @@
 	#Funktion zum Erstellen von Terminen anhand der angebenen Sondertermine
 	#Input:		$row - Reihe im Array der Module, welche nur Sondertermine angebenen haben
 	#Output:	$posts - Array aus Events für die angebenen Sondertermine
-	function create_sondertermine($row){
+	function create_sondertermine($row){		
 		
 		#Globale Variablen
 		#$csv - Array der Module, aus CSV importiert und formatiert
 		#$year - Jahr
 		#$feiertage - Feiertage für Berlin
 		global $csv, $year, $feiertage;
+		
+		echo '<br/>';
+		echo 'create_sondertermine für '.$csv[$row]['Modul'].' aus Reihe '.($row+2).'<br/>';
+		echo '<br/>';
 		
 		#Array zum Abspeichern der Termine
 		$sondertermine_array = array();
@@ -369,6 +414,8 @@
 			$end_time = setTimestamp($row, NULL, $entry, "2");			
 			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time);
 		}
+		
+		
 		
 		#Rückgabe von Event-Einträgen
 		return $posts;
