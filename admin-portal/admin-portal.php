@@ -26,10 +26,10 @@
      
         <li><a href="1">Register</a>
 			<ul>
-				<li><a href="2">Studiengänge</a> <!-- Import nach dem Auswählen -->
+				<li><a href="2">Studiengänge</a> 
 				<ul>
 			
-				<li><a href="#">Verwaltungsinformatik</a> <!-- Import nach dem Auswählen -->
+				<li><a href="3">Verwaltungsinformatik</a> <!-- Import nach dem Auswählen -->
 			</ul>
 			</ul>
         </li>
@@ -39,23 +39,19 @@
 	
 </nav>
 
-<br>
-<br>
+<br><br>
+
 <!-- Datei auswählen Button -->
 <form method="post" enctype="multipart/form-data">
   <label>Wählen Sie eine Textdatei (*.csv, *.html usw.) von Ihrem Rechner aus.
   <br>
     <input name="datei" type="file" size="50" accept="text/*"> 
   </label>  
-
-  
-  <br>
-  <br>
-  
-  <!-- Import /Upload Button der Datei -->
+		</form>
+		
+<br><br><br>
+ <!-- Import /Upload Button der Datei -->
   <button> Upload </button>
-</form>
-
 <!-- Vorschau Button , jpeg oder pdf -->
 <button onclick="myFunction()">Vorschau</button>
 <div id="myDIV">
@@ -73,6 +69,11 @@ function myFunction() {
         x.style.display = "none";
     }
 }
+
 </script>
+
+<?php
+	include 'json_sem.php';
+?>
 </body>
 <html>
