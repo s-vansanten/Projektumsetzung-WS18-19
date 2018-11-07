@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<link href='style.css' rel='stylesheet' />
+<title>Admin-Portal der HWR</title>
+</head>
+<body>
+<figure> <img src="https://upload.wikimedia.org/wikipedia/de/9/90/Hochschule_f%C3%BCr_Wirtschaft_und_Recht_Berlin_logo.svg" width="604" height="120"
+	alt="Logo">
+	
+</figure>
+<form action="admin-portal-login.html" method="post" id="logout">
+    <main>
+        <div>
+<button type="submit" id="logoutbutton" style="float: right;">Abmelden</button>
+        </div>    
+    </main>
+</form>    
+<br></br>
+<br></br>
+<h1>Herzlich Willkommen!</h1> 
+<br></br>
+
+<nav>
+	<ul>
+     
+        <li><a href="1">Register</a>
+			<ul>
+				<li><a href="2">Studiengänge</a> <!-- Import nach dem Auswählen -->
+				<ul>
+			
+				<li><a href="#">Verwaltungsinformatik</a> <!-- Import nach dem Auswählen -->
+			</ul>
+			</ul>
+        </li>
+		<li><a href="#">Versionskontrolle</a>
+		</li>
+	</ul> 
+	
+</nav>
+
+<br>
+<br>
+<!-- Datei auswählen Button -->
+<form method="post" enctype="multipart/form-data">
+  <label>Wählen Sie eine Textdatei (*.csv, *.html usw.) von Ihrem Rechner aus.
+  <br>
+    <input name="datei" type="file" size="50" accept="text/*"> 
+  </label>  
+
+  
+  <br>
+  <br>
+  
+  <!-- Import /Upload Button der Datei -->
+  <button> Upload </button>
+</form>
+
+<!-- Vorschau Button , jpeg oder pdf -->
+<button onclick="myFunction()">Vorschau</button>
+<div id="myDIV">
+  Fullcalender Vorschau jpeg
+</div>
+
+
+<script>
+/* Funktion für die Vorschau */
+function myFunction() {
+    var x = document.getElementById("myDIV");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+</body>
+<html>

@@ -3,6 +3,23 @@
 <head>
 <link href='style.css' rel='stylesheet' />
 <title>Admin-Portal der HWR</title>
+
+<script>
+				function pruefe(f){
+					var passwort = "hwr" ;
+					var name = "Lade" ;
+					var text = "Falscher Kennwort!";
+					if (f.username.value == name && f.password.value == passwort){
+						return true ;
+					}
+					else{
+						alert(text);
+						return false ;
+					}
+
+			}
+			</script>
+
 <link rel="shortcut icon" href="//moodle.hwr-berlin.de/pluginfile.php/1/theme_boost_campus/favicon/1539771992/favicon.png" />
 </head>
 <body>
@@ -13,7 +30,7 @@
 
 <h1>Admin-Portal der Hochschule f&uumlr Wirtschaft und Recht</h1>
 <main>
-	<form action="admin-portal.html" method="post" id="login">
+	<form action="admin-portal.html" onsubmit="return pruefe(this)" method="post" id="login">
 		<table>
 			<tbody>
 				<tr>
