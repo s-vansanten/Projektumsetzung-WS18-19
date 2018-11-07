@@ -254,7 +254,7 @@
 		}
 
 		#Routine zum Erstellen einer JSON-Datei
-		$file_name = 'events_'.$year.'_'.(date("Y-m-d", now)).'.json';
+		$file_name = 'events_'.$year.'_'.(date("Y-m-d")).'.json';
 		$fp = fopen($file_name,'w');
 		fwrite($fp, json_encode($posts));
 		fclose($fp);		
