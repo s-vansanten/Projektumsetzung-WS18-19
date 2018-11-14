@@ -5,7 +5,7 @@
                 <!fürs dropdown muss noch ne eigene css-formatierung angelegt werden!>
 		<select id="dropdown" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
-                    <option value="2" data-feed="_2018_2.json">2</option>
+                    <option value="2" data-feed="VI_2018_2.json">2</option>
                     <option value="4" data-feed="VI_2018_4.json">4</option>
                     <option value="6" data-feed="VI_2018_6.json">6</option>
                 </select>
