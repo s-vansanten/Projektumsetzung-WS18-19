@@ -9,5 +9,7 @@ sanem98       = Sanem
 ela1d         = Daniela
 skmgzm        = Gizem
 Yaalpo        = Yasmina
+Judith85      = Judith
+s-ercani      = Ismail
 s-vansanten   = Simon
 Spoing01      = Simon (Zweitaccount)
