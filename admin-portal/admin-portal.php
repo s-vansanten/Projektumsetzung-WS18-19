@@ -1,12 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link href='style.css' rel='stylesheet' />
+ <link href='style.css' rel='stylesheet' /> 
 <title>Admin-Portal der HWR</title>
 <script>
 
-var button = document.querySelector('vorschau');
-button.addEventListener('click', testFunction());
+
 
 </script>
 </head>
@@ -37,7 +36,7 @@ button.addEventListener('click', testFunction());
 				<li><a href="2">Studieng&aumlnge</a> <!-- Import nach dem Auswählen -->
 				<ul>
 			
-				<li><a href="#" onclick="showButtons()">Verwaltungsinformatik</a> <!-- Import nach dem Auswählen -->
+				<li><a href="#" onclick="showButtons()">Verwaltungsinformatik</a> <!-- klickt man auf VI, kommt die Vorsch 2,4,6 ->Vorschau verknüpfen -->
 			</ul>
 			</ul>
         </li>
@@ -50,10 +49,12 @@ button.addEventListener('click', testFunction());
 <br>
 <br>
 <!-- Datei auswählen Button -->
-<form method="post" enctype="multipart/form-data">
 	<form  method="post" enctype="multipart/form-data">
-    Select CSV file to upload:
+    Select CSV file to upload and create JSON files from:
     <input type="file" name="fileToUpload" id="fileToUpload">
+	<p>Letzer Vorlesungstag : <input type="date" name="end_lecture_time_input" /></p>
+	<p>Start Vorlesungspause : <input type="date" name="lecture_free_time_start_input" /></p>
+	<p>Ende Vorlesungspause : <input type="date" name="lecture_free_time_end_input" /></p>
     <input type="submit" value="Upload CSV" name="submit">
 	</form>
 
@@ -61,25 +62,32 @@ button.addEventListener('click', testFunction());
   <br>
   <br>
   
-
-  </div>
-</form>
-
-<!-- Vorschau Button , jpeg oder pdf -->
-<form action="admin-portal.php" method="post">
+  <form action="admin-portal.php" method="post">
    <input type="submit" name="vorschau" value="Vorschau"/>
 </form>
 
-<div id="myDIV">
-  Fullcalender Vorschau
- 
-</div>
+<?php
+#$selectedValue = $_POST['Auswahl'];
+?>  
 
 
 <?php
+
+	
+	
+	include 'create_json.php';
+	
+	$target_file = NULL;
 	$target_dir = "uploads/";
     if(isset($_FILES["fileToUpload"]["name"])){
-      $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+		$target_file = $target_dir .date("Y-m-d_His")."_". basename($_FILES["fileToUpload"]["name"]);
+		
+		#Vorlesungsfreie Zeit - wird später durch Admin-Eingabe gesetzt
+		$lecture_free_time_start = strtotime($_POST['lecture_free_time_start_input']);
+		$lecture_free_time_end = strtotime($_POST['lecture_free_time_end_input']);
+		
+		#Vorlesungszeit-Ende - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
+		$end_lecture_time = strtotime($_POST['end_lecture_time_input']);
     }
     $uploadOk = 1;
     if(isset($target_file)){
@@ -114,77 +122,71 @@ button.addEventListener('click', testFunction());
       // if everything is ok, try to upload file
       } else {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-          echo '<script type="text/javascript">alert("The file has been uploaded")</script>';
+			start_create($target_file); /*startfunktion*/
+			echo '<script type="text/javascript">alert("The file has been uploaded, events are creating and stored in JSON file.")</script>';		  
         } else {
-          echo '<script type="text/javascript">alert("Sorry, there was an error uploading your file.")</script>';
+			echo '<script type="text/javascript">alert("Sorry, there was an error uploading your file.")</script>';
         }
       } 
-    }
+    }	
 	
-	$fileName = NULL;
+	if(isset($_POST['vorschau'])){
+		
+		global $events_dir; /* event ordner */
+		echo select_files($events_dir, 'vorschau_menu', 'Vorhandene Event-Dateien: ', 30);
+	}
 	
-	function create_print(){
-		
-		global $fileName;
-		#Definieren des Dateinamen
-		$fileName = 'uploads/excel.csv';
-		#Einlesen der Datei in ein Array
-		$file = file($fileName);
-
-		#Array aus CSV Datei erstellen:
-		$csv[] = array_map(function($v){return str_getcsv($v, detectDelimiter());}, $file);
-
-		#Löschen des durch das Einlesen erstelle obere Array (csv[0] enthält das Array mit den CSV-Daten, csv[1] existiert nicht)
-		$csv = $csv[0];
-		
-		foreach($csv as $key => $values)
-		{
-			foreach ($values as $key => $entries){
-				echo $entries;
-				echo " ";
+	#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/
+	function select_files($dir, $select_name, $label = '', $curr_val = '', $mlength = 30) {
+		if ($handle = opendir($dir)) {
+			$mydir = '<form method="post" action="admin-portal.php">';
+			if ($label != '') $mydir .= '
+				<label for="'.$select_name.'">'.$label.'</label>';
+			$mydir .= '
+				<select name="'.$select_name.'" id="'.$select_name.'">';
+			$curr_val = (isset($_REQUEST[$select_name])) ? $_REQUEST[$select_name] : $curr_val;
+			if ($curr_val == '') {
+				$mydir .= '
+				<option value="" selected="selected">...</option>';
+			} else {
+				 $mydir .= '
+				 <option value="">...</option>';
+			while (false !== ($file = readdir($handle))) {
+				$files[] = $file;
 			}
-			echo "<br />";
+			closedir($handle);
+			sort($files);
+			$counter = 0;
+			foreach ($files as $val) {
+				if (is_file($dir.$val)) { // show only "real" files
+					$mydir .= '
+				<option value="'.$val.'"';
+					if ($val == $curr_val) $mydir .= ' selected="selected"';
+					$name = (strlen($val) > $mlength) ? substr($val, 0, $mlength).'...' : $val.'';
+					$mydir .= '>'.$name.'</option>';
+					$counter++;
+				}
+			}
+			$mydir .= '
+				</select><input type="submit" value="Auswählen" name="vorschau_menu_submit"/></form>';
+			}
+			if ($counter == 0) {
+				$mydir = 'No files!';
+			} else {
+				return $mydir;
+			}
 		}
-
-	}
-	
-	#Funktion zur Festellung des Trennzeichen der CSV-Datei
-    #wird beim Erstellen des Arrays aus der CSV-Datei verwendet
-	function detectDelimiter(){
-
-      #vorher global definierter Datei-Name
-      global $fileName;
-
-      #mögliche Trennzeichen
-      $delimiters = array(
-          ';' => 0,
-          ',' => 0,
-          "\t" => 0,
-          "|" => 0
-       );
-
-      #Öffnen der Datei, Auslesung der ersten Zeile und Schließen der Datei
-       $handle = fopen($fileName, "r");
-       $firstLine = fgets($handle);
-       fclose($handle);
-
-       #Iteration durch alle möglichen Trennzeichen und Zählung ihrer Anzahl in der ersten Zeile der CSV-Datei
-       foreach ($delimiters as $delimiter => &$count) {
-          $count = count(str_getcsv($firstLine, $delimiter));
-       }
-
-       #Rückgabe des Trennzeichen mit der höhsten Anzahl
-       return array_search(max($delimiters), $delimiters);
-    }
-	
-	
-	if(isset($_POST["vorschau"])){
-		create_print();
 	}
 	
 	
-
+	
+	if(isset($_POST['vorschau_menu_submit'])){
+		global $events_dir;
+		echo 'Ausgewählt ist '.$_POST['vorschau_menu'].'</br></br>';
+		print_r(json_encode(file_get_contents($events_dir.''.$_POST['vorschau_menu']),JSON_PRETTY_PRINT));
+		echo '</br></br></br></br>';
+	}
+	
 ?>
-
 </body>
 <html>
