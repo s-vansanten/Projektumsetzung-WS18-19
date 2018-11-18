@@ -1,39 +1,33 @@
 <?php
-#####################################################################################################################################################################
-#Verwendung: 	Einbindung im Admin-Portal durch "include 'create_json.php';"																						#
-#				Im Admin-Portal setzung der globalen Varialen 	$end_lecture_time			als Datum des letzten Vorlesungstages des Semesters						#
-#																$lecture_free_time_start 	als Anfangsdatum der vorlesungsfreien Zeit innerhalb des Semesters		#
-#																$lecture_free_time_end		als Enddatum der vorlesungsfreien Zeit innerhalb des Semesters			#
-#																																									#
-#				Im Admin-Portal zum Starten der JSON-Erstellungs-Routine  die Funktion start_create($file_name) ausführen.											#
-#				$file_name ist eine Variable mit dem Verweis auf eine hochgeladene Datei																			#
-#																																									#
-#				Im Unterordner "events/" werden dann JSON-Dateien mit folgendem Schema erstellt:																	#
-#						"Studiengang"_"Jahr des Semesterstartes"_"Semesternummer".json																				#
-#																																									#
-#####################################################################################################################################################################
+####################################################################################################################################################################
+#Verwendung: 	Einbindung im Admin-Portal durch "include 'create_json.php';"
+#				Im Admin-Portal setzung der globalen Varialen 	$end_lecture_time			als Datum des letzten Vorlesungstages des Semesters
+#																$lecture_free_time_start 	als Anfangsdatum der vorlesungsfreien Zeit innerhalb des Semesters
+#																$lecture_free_time_end		als Enddatum der vorlesungsfreien Zeit innerhalb des Semesters
+#
+#				Im Admin-Portal zum Starten der JSON-Erstellungs-Routine  die Funktion start_create($file_name) ausführen.
+#				$file_name ist eine Variable mit dem Verweis auf eine hochgeladene Datei
+#
+#				Im Unterordner "events/" werden dann JSON-Dateien mit folgendem Schema erstellt:
+#						"Studiengang"_"Jahr des Semesterstartes"_"Semesternummer".json
+#
+####################################################################################################################################################################
+		
+	ini_set("allow_url_fopen", 1);
+	ini_set('max_execution_time', 300);
 	
-	#Ordner zum Abspeichern der JSON-Dateien
 	$events_dir = "events/";
 	
-	#Global definierte Variable zum Umgehen von Scope-Problemen bei der Funktion "detectDelimiter"
 	$file_name_dect = NULL;
 	
-	#https://www.w3schools.com/cssref/css_colors.asp
-	$color_array = array("red", "blue", "gold", "green", "orange", "brown");
-	
-	#Start-Funktion für die Routine zur Erstellung von JSON-Dateien
-	#Input:		$file_name - Name einer hochgeladene CSV-Datei
-	#Output:	NULL	
 	function start_create($file_name){
 		
-		#Setzen der global definierte Variable zum Umgehen von Scope-Problemen bei der Funktion "detectDelimiter"
 		$GLOBALS['file_name_dect'] = $file_name;
-		
-		
-		#Einlesen der Datei
+		#Definieren des Dateinamen
+		#$fileName = "excel.csv";
+		#Einlesen der Datei in ein Array
 		$file = file($file_name);
-		#Array aus CSV Datei erstellen
+		#Array aus CSV Datei erstellen:
 		$csv[] = array_map(	function($v){return str_getcsv($v, detectDelimiter());}, $file);
 
 		#Löschen des durch das Einlesen erstelle obere Array (csv[0] enthält das Array mit den CSV-Daten, csv[1] existiert nicht)
@@ -50,18 +44,30 @@
 		  $csv[$row] = array_combine ($arr_key, $csv[$row]);
 		}		
 	
-		#TODO: JAHR ANPASSEN
 		#Jahr - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
-		$year = "2018";				
+		$year = "2018";
 		
-		create_json($csv, $year);
-	}	
+		#Feiertage-Array
+		$feiertage = array();
+		
+		
+		create_json($csv, $year, $feiertage);
+	}
+	
+	#Vorlesungsfreie Zeit - wird später durch Admin-Eingabe gesetzt
+	//$lecture_free_time_start = strtotime("2018-07-02");
+	//$lecture_free_time_end = strtotime("2018-07-08");
+		
+	#Vorlesungszeit-Ende - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
+	//$end_lecture_time = strtotime("2018-07-28");
+	//28. Juli 2018
+	
+	
 	
 	#Funktion zur Festellung des Trennzeichen der CSV-Datei
     #wird beim Erstellen des Arrays aus der CSV-Datei verwendet
     function detectDelimiter(){
 		
-		#Global definierte Variable zum Umgehen von Scope-Problemen bei der Funktion "detectDelimiter"
 		global $file_name_dect;
 		
 		#mögliche Trennzeichen
@@ -83,15 +89,15 @@
 		}
 
 		#Rückgabe des Trennzeichen mit der höhsten Anzahl
-		return array_search(max($delimiters), $delimiters);
+       return array_search(max($delimiters), $delimiters);
 	   
     }
 	
 	#Funktion zur Setzung eines Timestamp anhand der Übergabe der Woche und des Tages
-	#Input: 	$row - Reihe (somit Modul)
-	#			$week - Wochennummer als String (muss nicht zwinged übergeben werden, da der Wert auch durch "$csv[$row]['LV-Start']" abgerufen werden kann
-	#			$date_string
-	#			$start_or_end - Variable (Wert 1 oder 2, kann auf true/false angepasst werden), der bestimmt, ob die Startzeit- oder Endzeit-Spalte zur Berechnugn des Timestamps verwendet wird
+	#Input: $row - Reihe (somit Modul)
+	#		$week - Wochennummer als String (muss nicht zwinged übergeben werden, da der Wert auch durch "$csv[$row]['LV-Start']" abgerufen werden kann
+	#		$date_string
+	#		$start_or_end - Variable (Wert 1 oder 2, kann auf true/false angepasst werden), der bestimmt, ob die Startzeit- oder Endzeit-Spalte zur Berechnugn des Timestamps verwendet wird
 	#			$csv - Array der Module, aus CSV importiert und formatiert
 	#			$year - Jahr
 	function setTimestamp ($row, $week, $date_string, $start_or_end, $csv, $year){
@@ -215,27 +221,22 @@
 	#			$year - Jahr
 	#			$feiertage - Feiertage für Berlin
 	#Output:	NULL
-	function create_json($csv, $year){		
+	function create_json($csv, $year, $feiertage){		
 
-	
-		#Feiertage-Array
+		#Abruf von Feiertagen
+		#Info: https://feiertage-api.de/
 		#Alternativ https://www.php.de/forum/webentwicklung/php-einsteiger/1470253-feiertage-ermitteln
-		$feiertage = array(
-		date("Y-m-d", mktime(0,0,0,1,1,$year)),						//Neujahr
-		date("Y-m-d", mktime(0,0,0,1,1,$year+1)),					//Neujahr
-		date("Y-m-d", strtotime("-2 day",easter_date($year))),		//Karfreitag	
-		date("Y-m-d", easter_date($year)),							//Ostersonntag
-		date("Y-m-d", strtotime("+1 day",easter_date($year))),		//Ostermontag
-		date("Y-m-d", mktime(0,0,0,5,1,$year)),						//Tag der Arbeit
-		date("Y-m-d", strtotime("+39 day",easter_date($year))), 	//Christi Himmelfahrt
-		date("Y-m-d", strtotime("+49 day",easter_date($year))),		//Pfingstsonntag
-		date("Y-m-d", strtotime("+50 day",easter_date($year))),		//Pfingstmontag
-		date("Y-m-d", mktime(0,0,0,10,3,$year)), 					//Tag der Deutschen Einheit
-		date("Y-m-d", mktime(0,0,0,12,24,$year)),					//Heiligabend
-		date("Y-m-d", mktime(0,0,0,12,25,$year)),					//1. Weihnachtstag
-		date("Y-m-d", mktime(0,0,0,12,26,$year))					//2. Weihnachtstag
-		);
+		$feiertage_json = file_get_contents("http://feiertage-api.de/api/?jahr=2018&nur_land=BE");
+		#Decodierung der JSON-Datei
+		$feiertage_array = json_decode($feiertage_json, true);	
+
+		#TODO: Anhand von $feiertage_array können Tages-Events erstellt werden, damit ein Feiertag im Kalender angezeigt wird
+		#Jedoch beachten kein Ostersonntag, Pfingstsonntag, Heiligabend, Silvester in den Daten vorhanden
 		
+		#Extrahieren, der Datums-Informationen
+		foreach ($feiertage_array  as $key => $values){
+			array_push($feiertage, $values['datum']);			
+		}
 		
 		#Herausfiltern, welche Studiengänge und dazugehörige Semester alle in der CSV-Datei vertreten sind
 		$entries = array();
@@ -246,7 +247,7 @@
 		}
 		
 		#Aufruf von Unterfunktion zur Erstellung einer JSON-Datei für jedes vertretene Semester eines jeden vertretenen Studienganges
-		foreach ($entries as $values){			
+		foreach ($entries as $values){
 			create_json_semester($values, $csv, $year, $feiertage);
 		}		
 	}
@@ -259,35 +260,15 @@
 	#Output:	NULL
 	function create_json_semester($stud_sem, $csv, $year, $feiertage){		
 		
-		global $events_dir, $color_array;
+		global $events_dir;
 		
-		$id_counter = -1;		
-		$modul_id_catcher = array();		
 		$posts = array();
-		
 		#json-Array erstellen
 		#WICHTIGE Anmerkung: Anscheinend kommt es zu Problemen beim Encoden, wenn die letzte Zeile der csv-Datei mit eingelesen wird. Dort gibt es ein Ue, das den Vorgang zerstört.
 		#TODO: Es müsste somit eine Anpassung bei der Filterung der Datei erfolgen.
 		for ($row = 0; $row < count($csv)-2; $row++){
 			if($csv[$row]['Sem'] == $stud_sem['Sem']){
 				$kw_start = $csv[$row]['LV-Start'];
-				
-				#TODO: Schema verbessern - gerade XX , später XXy (XX Zahlen, y Buchstabe)
-				
-				#preg_match_all('/M +[0-9]+[0-9]/', utf8_encode($title) ,$modul_token);
-				#$modul_token = $modul_token[0];
-				$modul_token = (int) filter_var($csv[$row]['Modul'], FILTER_SANITIZE_NUMBER_INT);
-				echo "TOKEN: ".$modul_token."</br>";
-				if(in_array($modul_token, $modul_id_catcher)){
-					$id = array_search($modul_token, $modul_id_catcher);
-					$color = $color_array[$id];
-				}else{
-					$id_counter++;
-					$modul_id_catcher[] = $modul_token;
-					$id = $id_counter;
-					$color = $color_array[$id_counter];	
-				}				
-				
 				#Fall: LV-Start is set
 				if($kw_start != NULL){
 					$title = $csv[$row]['Modul'];
@@ -299,8 +280,7 @@
 					}else{
 						$sonder_catch = NULL;
 					}
-					
-					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch, 'id'=>$id, 'color'=>$color);
+					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch);
 					#Fall: Extra-Info steht in LV-Start, hier Turnus
 					if(strlen((string)(float) filter_var($kw_start, FILTER_SANITIZE_NUMBER_FLOAT)) != 2){
 						$posts = array_merge($posts, create_returning($modul_entry_start, 2, $year, $feiertage));
@@ -311,15 +291,11 @@
 					}
 				#Fall: LV-Start not set && Sondertermine is set	
 				}else if($kw_start == NULL && $csv[$row]['Sondertermine'] != NULL ){
-					$posts = array_merge($posts, create_sondertermine($row, $csv, $year, $feiertage, $id));					
+					$posts = array_merge($posts, create_sondertermine($row, $csv, $year, $feiertage));					
 				}
+				
 			}		
 		}
-		
-		print_r($modul_id_catcher);
-		
-		
-		$posts = array_merge($posts, create_feiertage($year));
 		
 		#Routine zum Erstellen einer JSON-Datei
 		$file_name = $events_dir.$stud_sem['Studgang'].'_'.$year.'_'.$stud_sem['Sem'].'.json';
@@ -347,8 +323,6 @@
 		#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format
 		$modul_end_date = strtotime($entry['end']);
 		$title = $entry['title'];
-		$id = $entry['id'];
-		$color = $entry['color'];
 			
 		while($end_lecture_time > $modul_start_date){
 			
@@ -375,11 +349,11 @@
 						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries[0][$i].".".$year))){
 							$new_modul_start_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_start_date));
 							$new_modul_end_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_end_date));
-							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color);
+							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date));
 						}
 					}
 				}else{
-					$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color);
+					$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date));
 				}								
 			}			
 			
@@ -398,9 +372,7 @@
 	#			$year - Jahr
 	#			$feiertage - Feiertage für Berlin
 	#Output:	$posts - Array aus Events für die angebenen Sondertermine
-	function create_sondertermine($row, $csv, $year, $feiertage, $id){		
-		
-		global $color_array;
+	function create_sondertermine($row, $csv, $year, $feiertage){		
 		
 		#Array zum Abspeichern der Termine
 		$sondertermine_array = array();
@@ -418,40 +390,17 @@
 		
 		#Titel-Deklaration des Moduls
 		$title = $csv[$row]['Modul'];
-		$color = $color_array[$id];
 		
 		#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
 		foreach ($sondertermine_array as $entry){
 			$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year);
 			$end_time = setTimestamp($row, NULL, $entry, "2", $csv, $year);			
-			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color);
-		}		
+			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time);
+		}
+		
+		
 		
 		#Rückgabe von Event-Einträgen
 		return $posts;		
-	}
-	
-	#Funktion zum Erstellen von Feiertags-Terminen
-	#Input:		$year - Jahr
-	#Output:	$posts - Array aus ganztägigen Events für Feiertage des Landes Berlins
-	function create_feiertage($year){
-				
-		$posts = array();
-		
-		$posts[] = array('title'=> 'Neujahr','start'=>date("Y-m-d", mktime(0,0,0,1,1,$year)),'end'=>date("Y-m-d", mktime(0,0,0,1,1,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Neujahr','start'=>date("Y-m-d", mktime(0,0,0,1,1,$year+1)),'end'=>date("Y-m-d", mktime(0,0,0,1,1,$year+1)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Karfreitag','start'=>date("Y-m-d", strtotime("-2 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("-2 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Ostersonntag','start'=>date("Y-m-d", easter_date($year)),'end'=>date("Y-m-d", easter_date($year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Ostermontag','start'=>date("Y-m-d", strtotime("+1 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+1 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Tag der Arbeit','start'=>date("Y-m-d", mktime(0,0,0,5,1,$year)),'end'=>date("Y-m-d", mktime(0,0,0,5,1,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Christi Himmelfahrt','start'=>date("Y-m-d", strtotime("+39 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+39 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Pfingstsonntag','start'=>date("Y-m-d", strtotime("+49 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+49 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Pfingstmontag','start'=>date("Y-m-d", strtotime("+50 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+50 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Tag der Deutschen Einheit','start'=>date("Y-m-d", mktime(0,0,0,10,3,$year)),'end'=>date("Y-m-d", mktime(0,0,0,10,3,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Heiligabend','start'=>date("Y-m-d", mktime(0,0,0,12,24,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,24,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> '1. Weihnachtstag','start'=>date("Y-m-d", mktime(0,0,0,12,25,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,25,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> '2. Weihnachtstag','start'=>date("Y-m-d", mktime(0,0,0,12,26,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,26,$year)), 'allDay'=>true, 'color'=>'red');
-		
-		return $posts;
 	}
 ?>

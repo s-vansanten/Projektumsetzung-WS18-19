@@ -5,38 +5,9 @@
                 <!fürs dropdown muss noch ne eigene css-formatierung angelegt werden!>
 		<select id="dropdown" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
-                    <?php
-					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir = "../test/events/";
-					$handle = opendir($dir);
-					while (false !== ($file = readdir($handle))) {
-						$files[] = $file;
-					}
-					closedir($handle);
-					sort($files);
-
-					#TODO: Hier Ansortierung von Dateien, welche nicht mehr notwendig sind
-					#das heißt: keine Datei von alten Semester
-					
-					$counter = 0;
-					foreach ($files as $val) {
-						if (is_file($dir.$val)) { // show only "real" files
-							$mydir .= '
-							<option value="'.$dir.$val.'" data-feed="'.$dir.$val.'"';
-							
-							#TODO: Hier Namensanpassung
-							#Schema: VI_2018_2.json
-							
-							#$name = (strlen($val) > $mlength) ? substr($val, 0, $mlength).'...' : $val.'';
-							$name = $val;
-							$mydir .= '>'.$name.'</option>';
-							$counter++;
-						}
-					}
-					file_put_contents('test.txt', $mydir);
-					file_put_contents('test2.txt', $files);
-					echo $mydir;
-					?>
+                    <option value="2" data-feed="VI_2018_2.json">2</option>
+                    <option value="4" data-feed="VI_2018_4.json">4</option>
+                    <option value="6" data-feed="VI_2018_6.json">6</option>
                 </select>
                     
                 <!css ist unten zu finden - postionierung etc.!>
@@ -47,7 +18,7 @@
     <head>
                 <!nicht sicher ,ob alles gebraucht wird!>
 		<link rel="stylesheet" href="css/jquery-ui.min.css">
-        <link rel='stylesheet' href='fullcalendar.css' />
+                <link rel='stylesheet' href='fullcalendar.css' />
 		<script src='lib/jquery.min.js'></script>
 		<script src='lib/moment.min.js'></script>                       
 		<script src='fullcalendar.js'></script>
