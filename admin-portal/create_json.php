@@ -19,6 +19,7 @@
 	#Global definierte Variable zum Umgehen von Scope-Problemen bei der Funktion "detectDelimiter"
 	$file_name_dect = NULL;
 	
+	#Array mit zu verwendenen Farben
 	#https://www.w3schools.com/cssref/css_colors.asp
 	$color_array = array("red", "blue", "gold", "green", "orange", "brown");
 	
@@ -27,6 +28,8 @@
 	#Output:	NULL	
 	function start_create($file_name){
 		
+		global $end_lecture_time;
+		
 		#Setzen der global definierte Variable zum Umgehen von Scope-Problemen bei der Funktion "detectDelimiter"
 		$GLOBALS['file_name_dect'] = $file_name;
 		
@@ -34,8 +37,19 @@
 		#Einlesen der Datei
 		$file = file($file_name);
 		#Array aus CSV Datei erstellen
-		$csv[] = array_map(	function($v){return str_getcsv($v, detectDelimiter());}, $file);
-
+		$csv[] = array_map(	function($v){return str_getcsv($v, detectDelimiter());}, $file);	
+		
+		#Konvertierung in UTF8 zur Eliminierung von Problemen mit Umlauten
+		#via http://nazcalabs.com/blog/convert-php-array-to-utf8-recursively/
+		#Löst 2 Probleme:
+		#Beim zeilenweisen Durchlaufen des Arrays in Funktion "create_json_semester" kann sich das Programm aufhängen, wenn es auf die Zeile "Module mit mehreren Schwerpunkten / Teilung LV und Übung" traf wegen dem "Ü"
+		#In der Funktion "create_returning" beim Aufruf der php-Funktion "preg_match_all" muss jetzt nicht mehr der Input in UTF8 konvertiert werden. Ohne Konvertierung kam es zu Problemen, da im Text "dafür" steht
+		array_walk_recursive($csv, function(&$item, $key){
+        if(!mb_detect_encoding($item, 'utf-8', true)){
+                $item = utf8_encode($item);
+        }
+		});
+		
 		#Löschen des durch das Einlesen erstelle obere Array (csv[0] enthält das Array mit den CSV-Daten, csv[1] existiert nicht)
 		$csv = $csv[0];
 		
@@ -48,11 +62,19 @@
 		#Jedem Eintrag wird der dazugehörigen Spalten-Name als Key hinzugefügt, damit nicht nach Spalten-Nummer sondern nach Spalten-Name später gesucht werden kann
 		for ($row = 0; $row < count($csv); $row++) {
 		  $csv[$row] = array_combine ($arr_key, $csv[$row]);
-		}		
-	
-		#TODO: JAHR ANPASSEN
-		#Jahr - sollte später entweder durch Auslesen aus der CSV oder durch Admin-Eingabe gesetzt werden
-		$year = "2018";				
+		}
+			
+		#Jahr wird durch Verwendung von $end_lecture_time gesetzt
+		#Fall 1: Monat Januar bis Mai => Start des Semesters liegt ein Jahr vor dem Ende des Semesters
+		#Fall 2: Monat Juni bis Dezember => Start des Semesters liegt im gleichem Jahr wie das Ende des Semesters
+		if(date("m", $end_lecture_time) < 6 && date("m", $end_lecture_time) >= 0){
+			$year = date("Y", $end_lecture_time)-1;
+		}else if(date("m", $end_lecture_time) >= 6 && date("m", $end_lecture_time) <= 12){
+			$year = date("Y", $end_lecture_time);
+		}else{
+			echo '"$end_lecture_time" falsch gesetzt';
+			return;
+		}
 		
 		create_json($csv, $year);
 	}	
@@ -219,7 +241,7 @@
 
 	
 		#Feiertage-Array
-		#Alternativ https://www.php.de/forum/webentwicklung/php-einsteiger/1470253-feiertage-ermitteln
+		#https://www.php.de/forum/webentwicklung/php-einsteiger/1470253-feiertage-ermitteln
 		$feiertage = array(
 		date("Y-m-d", mktime(0,0,0,1,1,$year)),						//Neujahr
 		date("Y-m-d", mktime(0,0,0,1,1,$year+1)),					//Neujahr
@@ -259,25 +281,30 @@
 	#Output:	NULL
 	function create_json_semester($stud_sem, $csv, $year, $feiertage){		
 		
+		#Einbindung der globalen Variablen
+		#$events_dir 	- Ordner zum Abspeichern der JSON-Dateien
+		#$color_array	- Array mit zu verwendenen Farben
 		global $events_dir, $color_array;
 		
-		$id_counter = -1;		
-		$modul_id_catcher = array();		
+		#Erzeugen des ID-Zählers und setzen auf -1, da vor der ersten Verwendung der Zähler um Eins erhöht wird
+		$id_counter = -1;
+		#Erzeugen eines Array zum Festhalten von verwendeten IDs für die jeweilige Modul-Nummer		
+		$modul_id_catcher = array();
+		#Erzeugen eines Array zum Erfassen aller Event-Einträge
 		$posts = array();
 		
 		#json-Array erstellen
-		#WICHTIGE Anmerkung: Anscheinend kommt es zu Problemen beim Encoden, wenn die letzte Zeile der csv-Datei mit eingelesen wird. Dort gibt es ein Ue, das den Vorgang zerstört.
-		#TODO: Es müsste somit eine Anpassung bei der Filterung der Datei erfolgen.
-		for ($row = 0; $row < count($csv)-2; $row++){
+		for ($row = 0; $row < count($csv); $row++){
 			if($csv[$row]['Sem'] == $stud_sem['Sem']){
 				$kw_start = $csv[$row]['LV-Start'];
 				
-				#TODO: Schema verbessern - gerade XX , später XXy (XX Zahlen, y Buchstabe)
+				#Ließt die Spalte "Modul" aus und extrahiert die Modul-Nummer (Schema XYz - X = Zahl, Y = Zahl, z = kleiner Buchstabe oder Leerstelle)
+				preg_match('/[0-9]+[0-9]+[a-z\ ]/', utf8_encode($csv[$row]['Modul']) ,$modul_token);
+				$modul_token = $modul_token[0];
 				
-				#preg_match_all('/M +[0-9]+[0-9]/', utf8_encode($title) ,$modul_token);
-				#$modul_token = $modul_token[0];
-				$modul_token = (int) filter_var($csv[$row]['Modul'], FILTER_SANITIZE_NUMBER_INT);
-				echo "TOKEN: ".$modul_token."</br>";
+				#Überprüfen, ob für die Modul-Nummer schon ein ID gesetzt wurde
+				#Wenn ja, werdenen der ID sowie der dazugehörigen Farbe
+				#Wenn nicht, erhöhen des ID-Zählers
 				if(in_array($modul_token, $modul_id_catcher)){
 					$id = array_search($modul_token, $modul_id_catcher);
 					$color = $color_array[$id];
@@ -314,11 +341,9 @@
 					$posts = array_merge($posts, create_sondertermine($row, $csv, $year, $feiertage, $id));					
 				}
 			}		
-		}
+		}		
 		
-		print_r($modul_id_catcher);
-		
-		
+		#Hinzufügen von Feiertagen
 		$posts = array_merge($posts, create_feiertage($year));
 		
 		#Routine zum Erstellen einer JSON-Datei
@@ -350,9 +375,7 @@
 		$id = $entry['id'];
 		$color = $entry['color'];
 			
-		while($end_lecture_time > $modul_start_date){
-			
-			#TODO: Check von Anpassungen des Turnus durch Sondertermin-Einschränkung
+		while($end_lecture_time > $modul_start_date){			
 			
 			#Check von Feiertagen & Check vorlesungsfreier Zeit
 			if(!in_array(date("Y-m-d", $modul_start_date), $feiertage) && !($modul_start_date>$lecture_free_time_start && $modul_start_date<$lecture_free_time_end+86400)){
@@ -360,10 +383,11 @@
 				#nicht 09.06., dafür 16.06.
 				if($entry['sonder_catch'] != NULL){
 					$sonder_catch_entries;
-					preg_match_all('/nicht +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', utf8_encode($entry['sonder_catch']) ,$sonder_catch_entries[0]);
-					preg_match_all('/dafür +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', utf8_encode($entry['sonder_catch']) ,$sonder_catch_entries[1]);
+					preg_match_all('/nicht +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[0]);
+					preg_match_all('/dafür +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[1]);
 					$sonder_catch_entries[0] = $sonder_catch_entries[0][0];
 					$sonder_catch_entries[1] = $sonder_catch_entries[1][0];
+					
 					for($i = 0; $i < count($sonder_catch_entries[0]); $i++){
 						$sonder_catch_entries[0][$i] = preg_replace('/nicht /', '', $sonder_catch_entries[0][$i]);
 					}
@@ -408,7 +432,7 @@
 		#Eintrag von Sonderterminen		
 		$sondertermine_plan_text = $csv[$row]['Sondertermine'];	
 		
-		#Funkiton such nach dem verwendeten Datumsschema im Eintrag von Sonderterminen und speichert diese in einem Array
+		#Funktion such nach dem verwendeten Datumsschema im Eintrag von Sonderterminen und speichert diese in einem Array
 		preg_match_all('/[0-9]+[0-9]+[.]+[0-9]+[0-9]/', $sondertermine_plan_text ,$sondertermine_array);
 		#Reduzierung des drei-dimensonalen Arrays in ein zwei-dimensonales Array 
 		$sondertermine_array = $sondertermine_array[0];
