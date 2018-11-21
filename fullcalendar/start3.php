@@ -7,7 +7,7 @@
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
                     <?php
 					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir = "../test/events/";
+					$dir = "../admin-portal/events/";
 					$handle = opendir($dir);
 					while (false !== ($file = readdir($handle))) {
 						$files[] = $file;
@@ -32,9 +32,7 @@
 							$mydir .= '>'.$name.'</option>';
 							$counter++;
 						}
-					}
-					file_put_contents('test.txt', $mydir);
-					file_put_contents('test2.txt', $files);
+					};
 					echo $mydir;
 					?>
                 </select>
