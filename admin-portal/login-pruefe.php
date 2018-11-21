@@ -11,7 +11,7 @@ $pass = sha1($passwort);
 if($username == "Lade" AND $pass=="38a54b2fecf34f57b017694db2222758fa2ad59c")
    {
    
-   header ('Location: admin-portal.php');
+   header ('Location: admin-portal-v2.php');
    
    }
 else
