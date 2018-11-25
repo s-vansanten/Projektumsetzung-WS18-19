@@ -13,6 +13,8 @@
 #																																									#
 #####################################################################################################################################################################
 	
+	include 'create_ics.php';
+	
 	#Ordner zum Abspeichern der JSON-Dateien
 	$events_dir = "events/";
 	
@@ -351,6 +353,8 @@
 		$fp = fopen($file_name,'w');
 		fwrite($fp, json_encode($posts));
 		fclose($fp);
+		
+		start_create_ics($file_name);
 	}
 	
 	#Funktion zur Erstellung von wöchentlichen oder mehr-wöchentlichen Terminen
