@@ -10,7 +10,7 @@
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
                     <?php
 					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir = "../test/events/";
+					$dir = "../admin-portal/events/";
 					$handle = opendir($dir);
 					while (false !== ($file = readdir($handle))) {
 						$files[] = $file;
@@ -114,7 +114,7 @@
                     <option value="Semester2" >Semester wählen</option>
                     <?php
 					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir2 = "../test/ics/";
+					$dir2 = "../admin-portal/ics/";
 					$handle2 = opendir($dir2);
 					while (false !== ($file2 = readdir($handle2))) {
 						$files2[] = $file2;
@@ -194,7 +194,6 @@
 							$val2_major = array();
 							preg_match('/[A-Z][A-Z]/', $val2 ,$val2_major);
 							$val2_major = $val2_major[0];
-							file_put_contents("test.txt", $val2_major);
 							
 							if($val2_major == "VI"){
 								$name .= "Verwaltungsinformatik ";
