@@ -1,22 +1,70 @@
 <html>
+<?php
+	#include 'php/create_ics.php';
+?>
     <body>
-          <span>Verwaltungsinformatik:</span>
+		<span>Verwaltungsinformatik:</span>
                 <!dropdown-menu
                 <!fürs dropdown muss noch ne eigene css-formatierung angelegt werden!>
 		<select id="dropdown" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
                     <?php
 					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir = "../admin-portal/events/";
+					$dir = "../test/events/";
 					$handle = opendir($dir);
 					while (false !== ($file = readdir($handle))) {
 						$files[] = $file;
 					}
 					closedir($handle);
-					sort($files);
+					sort($files);	
+					
 
-					#TODO: Hier Ansortierung von Dateien, welche nicht mehr notwendig sind
+					#TODO: Hier Aussortierung von Dateien, welche nicht mehr notwendig sind
 					#das heißt: keine Datei von alten Semester
+					foreach($files as $entry){
+						if(is_file($dir.$entry)){
+							$entry_year = array();
+							preg_match('/[0-9][0-9][0-9][0-9]/', $entry ,$entry_year);
+							$entry_year = $entry_year[0];							
+							
+							$entry_sem = array();
+							preg_match('/[0-9][.]/', $entry ,$entry_sem);						
+							$entry_sem = $entry_sem[0];
+							$entry_sem = $entry_sem+0;
+							
+							$entry_major = array();
+							preg_match('/[A-Z][A-Z]/', $entry ,$entry_major);
+							$entry_major = $entry_major[0];
+							
+							#Entry_Year != Year (Bsp: 2017 != 2018) ODER Entry_Year != Jetzt-3Monate (Bsp: es ist März 2019, es gilt aber weiter 2018 ungerade Semester)
+							if($entry_year != date("Y") OR $entry_year != date("Y", time()-7889400)){
+								$key = array_search($entry,$files);
+								if($key!==false){
+									unset($files[$key]);
+								}
+							}
+							
+							#Oktober bis März => lösche gerade Semester
+							if(date("n")>= 10 OR date("n")<4){
+								#TODO: Hier falsch gecodet fürs Beispiel!!! == auf != ändern
+								if($entry_sem %2 != 0){
+									$key = array_search($entry,$files);
+									if($key!==false){
+										unset($files[$key]);
+									}
+								}	
+							}
+							#April bis September => lösche ungerade Semester
+							else if(date("n")>= 4 && date("n")<10){
+								if($entry_sem %2 != 0){
+									$key = array_search($entry,$files);
+									if($key!==false){
+										unset($files[$key]);
+									}
+								}	
+							}
+						}
+					}
 					
 					$counter = 0;
 					foreach ($files as $val) {
@@ -27,19 +75,142 @@
 							#TODO: Hier Namensanpassung
 							#Schema: VI_2018_2.json
 							
-							#$name = (strlen($val) > $mlength) ? substr($val, 0, $mlength).'...' : $val.'';
-							$name = $val;
+							$name = "";
+							
+							$val_year = array();
+							preg_match('/[0-9][0-9][0-9][0-9]/', $val ,$val_year);
+							$val_year = $val_year[0];							
+							
+							$val_sem = array();
+							preg_match('/[0-9][.]/', $val ,$val_sem);						
+							$val_sem = $val_sem[0];
+							$val_sem = $val_sem+0;
+							
+							$val_major = array();
+							preg_match('/[A-Z][A-Z]/', $val ,$val_major);
+							$val_major = $val_major[0];
+							
+							if($val_major == "VI"){
+								$name .= "Verwaltungsinformatik ";
+							}
+							
+							$name .= $val_sem.". Semester ".$val_year;
+							
+							
 							$mydir .= '>'.$name.'</option>';
 							$counter++;
 						}
-					};
+					}					
 					echo $mydir;
 					?>
-                </select>
+		</select>
                     
-                <!css ist unten zu finden - postionierung etc.!>
-                <div id="calendar"></div>
+		<!css ist unten zu finden - postionierung etc.!>
+		<div id="calendar"></div>
+		
+		<span>Download ICS:</span>
+		
+		<select id="download" onChange="download(this.value)" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
+                    <option value="Semester2" >Semester wählen</option>
+                    <?php
+					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
+					$dir2 = "../test/ics/";
+					$handle2 = opendir($dir2);
+					while (false !== ($file2 = readdir($handle2))) {
+						$files2[] = $file2;
+					}
+					closedir($handle2);
+					sort($files2);
 
+					#TODO: Hier Aussortierung von Dateien, welche nicht mehr notwendig sind
+					#das heißt: keine Datei von alten Semester
+					#TODO: Hier Aussortierung von Dateien, welche nicht mehr notwendig sind
+					#das heißt: keine Datei von alten Semester
+					foreach($files2 as $entry){
+						if(is_file($dir2.$entry)){
+							$entry_year = array();
+							preg_match('/[0-9][0-9][0-9][0-9]/', $entry ,$entry_year);
+							$entry_year = $entry_year[0];							
+							
+							$entry_sem = array();
+							preg_match('/[0-9][.]/', $entry ,$entry_sem);						
+							$entry_sem = $entry_sem[0];
+							$entry_sem = $entry_sem+0;
+							
+							$entry_major = array();
+							preg_match('/[A-Z][A-Z]/', $entry ,$entry_major);
+							$entry_major = $entry_major[0];
+							
+							#Entry_Year != Year (Bsp: 2017 != 2018) ODER Entry_Year != Jetzt-3Monate (Bsp: es ist März 2019, es gilt aber weiter 2018 ungerade Semester)
+							if($entry_year != date("Y") OR $entry_year != date("Y", time()-7889400)){
+								$key = array_search($entry,$files2);
+								if($key!==false){
+									unset($files2[$key]);
+								}
+							}
+							
+							#Oktober bis März => lösche gerade Semester
+							if(date("n")>= 10 OR date("n")<4){
+								#TODO: Hier falsch gecodet fürs Beispiel!!! == auf != ändern
+								if($entry_sem %2 != 0){
+									$key = array_search($entry,$files2);
+									if($key!==false){
+										unset($files2[$key]);
+									}
+								}	
+							}
+							#April bis September => lösche ungerade Semester
+							else if(date("n")>= 4 && date("n")<10){
+								if($entry_sem %2 != 0){
+									$key = array_search($entry,$files2);
+									if($key!==false){
+										unset($files2[$key]);
+									}
+								}	
+							}
+						}
+					}
+					
+					$counter2 = 0;
+					foreach ($files2 as $val2) {
+						if (is_file($dir2.$val2)) { // show only "real" files
+							$mydir2 .= '
+							<option value="'.$dir2.$val2.'"';
+							
+							#TODO: Hier Namensanpassung
+							#Schema: VI_2018_2.ics
+							
+							$name2 = "";
+							
+							$val2_year = array();
+							preg_match('/[0-9][0-9][0-9][0-9]/', $val2 ,$val2_year);
+							$val2_year = $val2_year[0];							
+							
+							$val2_sem = array();
+							preg_match('/[0-9][.]/', $val2 ,$val2_sem);						
+							$val2_sem = $val2_sem[0];
+							$val2_sem = $val2_sem+0;
+							
+							$val2_major = array();
+							preg_match('/[A-Z][A-Z]/', $val2 ,$val2_major);
+							$val2_major = $val2_major[0];
+							file_put_contents("test.txt", $val2_major);
+							
+							if($val2_major == "VI"){
+								$name .= "Verwaltungsinformatik ";
+							}
+							
+							$name2 .= $val2_sem.". Semester ".$val2_year;
+							
+							$mydir2 .= '>'.$name2.'</option>';
+							$counter2++;
+						}
+					}					
+					echo $mydir2;
+					?>
+		</select>
+				
+				
     </body>
     
     <head>
@@ -93,6 +264,11 @@
                 //Übertragung feed auf selected feed, welches bei Eventsource benutzt wird
                 selectedFeed = feed;
                 };
+				
+		function download(d){
+			if(d == 'Semester2') return;
+			window.location = d;
+		}
 		</script>
 	
                 <style>
