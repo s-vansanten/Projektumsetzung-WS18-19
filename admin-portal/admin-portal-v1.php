@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link href='style.css' rel='stylesheet' />
+<link href='../admin/style/style.css' rel='stylesheet' />
 <title>Admin-Portal der HWR</title>
 <script>
 
@@ -10,46 +10,63 @@
 <body>
 
 
-<figure> <img src="https://upload.wikimedia.org/wikipedia/de/9/90/Hochschule_f%C3%BCr_Wirtschaft_und_Recht_Berlin_logo.svg" width="604" height="120"
-	alt="Logo">
-	
-</figure>
-<form action="admin-portal-login.html" method="post" id="logout">
+
+<form action="admin-portal-login.php" method="post" id="logout">
     <main>
-        <div>
-<button type="submit" id="logoutbutton" style="float: right;">Abmelden</button>
+        <div  >
+<button type="submit" id="logoutbutton" style="float: right; margin-right:50px; margin-top: 10px;">Abmelden</button>
         </div>    
     </main>
-</form>    
-<br></br>
-<br></br>
-<h1>Herzlich Willkommen!</h1> 
-<br></br>
+</form> 
 
-<br>
-<br>
+
+ <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;"> 
+<!-- admin portal zur studienplanung als überschrift,
+upload button name in importieren -->
+<figure> <img src="https://upload.wikimedia.org/wikipedia/de/9/90/Hochschule_f%C3%BCr_Wirtschaft_und_Recht_Berlin_logo.svg" width="604" height="120"
+	alt="Logo">
+	</figure>
+<br></br>
+<div class="title" style="margin-left:450px ;margin-right:50px; margin-top: 10px; color= red;">
+<div class="ü1" style="margin-left: 26px; color:#6B6F73;">
+<h1>Herzlich Willkommen!</h1> 
+</div>
+<div class="ü2" style="margin-left: 5px; color:#d30000;">
+<h2>Admin-Portal für die Lehrplanung</h2>
+</div>
+<br></br>
+</div>
+
+ </blockquote>  
+ 
+ 
+<blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;">
+<br> </br>
+
 <!-- Datei auswählen Button -->
 	<form  method="post" enctype="multipart/form-data">
-    Select CSV file to upload and create JSON files from:
+    <!-- Select CSV file to upload and create JSON files from: -->
     <input type="file" name="fileToUpload" id="fileToUpload">
+	<div class="menu" style="margin-left:10px;">
 	<p>Letzer Vorlesungstag : <input type="date" name="end_lecture_time_input" /></p>
 	<p>Start Vorlesungspause : <input type="date" name="lecture_free_time_start_input" /></p>
 	<p>Ende Vorlesungspause : <input type="date" name="lecture_free_time_end_input" /></p>
-    <input type="submit" value="Upload CSV" name="submit">
+	</div>
+	<div class="buttons" style="margin-left:10px;">
+	<div class="b2" style="margin-left: -7px;">
+	<input type="button" name="vorschau" value="Vorschau"/>
+    <input type="submit" value="Importieren" name="submit">
+	</div>
 	</form>
+	</div>
+<blockquote>
+<br><br>
+<br>
 
-  
-  <br>
-  <br>
-  
-  <form action="admin-portal-v1.php" method="post">
-   <input type="submit" name="vorschau" value="Vorschau"/>
-</form>
 
-<?php
-#$selectedValue = $_POST['Auswahl'];
-?>  
-
+<div class="bc"  style="margin-left:-34px;">
+<a href='../fullcalendar/start3.php'><button>Kalender anzeigen</button></a>
+</div>
 
 <?php
 
@@ -168,5 +185,33 @@
 	}
 	
 ?>
+
+<style>
+
+/** Hintergrund  **/
+body {
+	background-color: #fefefe ;}
+
+blockquote{blockquote {
+   padding: 5px;
+   margin-top: 5px;
+   width: 80%;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1.2em;
+   font-family: UnBatang, FreeSerif, Georgia, serif;
+   font-size: 1.2em;
+   background-color: white;
+}
+blockquote i {
+   color: blue;
+}
+
+title{
+	text-align: center;
+}
+
+	
+</style>
 </body>
 <html>
