@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link href='../admin/style/style.css' rel='stylesheet' />
+<link href="/style/style.css" rel="stylesheet" />
 <title>Admin-Portal der HWR</title>
 <script>
 
@@ -20,40 +20,38 @@
 </form> 
 
 
- <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;"> 
+ <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; background-color: white"> 
 <!-- admin portal zur studienplanung als überschrift,
 upload button name in importieren -->
 <figure> <img src="https://upload.wikimedia.org/wikipedia/de/9/90/Hochschule_f%C3%BCr_Wirtschaft_und_Recht_Berlin_logo.svg" width="604" height="120"
 	alt="Logo">
 	</figure>
 <br></br>
-<div class="title" style="margin-left:450px ;margin-right:50px; margin-top: 10px; color= red;">
-<div class="ü1" style="margin-left: 26px; color:#6B6F73;">
-<h1>Herzlich Willkommen!</h1> 
-</div>
-<div class="ü2" style="margin-left: 5px; color:#d30000;">
-<h2>Admin-Portal für die Lehrplanung</h2>
-</div>
-<br></br>
-</div>
-
  </blockquote>  
  
  
-<blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;">
+<blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;background-color:white">
 <br> </br>
+<div class="title" style="margin-left:30px ;margin-right:50px; margin-top: 10px; color= red;">
+<div class="ü1" style="margin-left: -20px; color:#6B6F73;">
+<h2>Interaktives Vorlesungsverzeichnis</h2> 
+</div>
 
+<br></br>
+</div>
 <!-- Datei auswählen Button -->
+	<div class="button" style="margin-left:9px;">
 	<form  method="post" enctype="multipart/form-data">
     <!-- Select CSV file to upload and create JSON files from: -->
     <input type="file" name="fileToUpload" id="fileToUpload">
+	</div>
 	<div class="menu" style="margin-left:10px;">
 	<p>Letzer Vorlesungstag : <input type="date" name="end_lecture_time_input" /></p>
 	<p>Start Vorlesungspause : <input type="date" name="lecture_free_time_start_input" /></p>
 	<p>Ende Vorlesungspause : <input type="date" name="lecture_free_time_end_input" /></p>
 	</div>
 	<div class="buttons" style="margin-left:10px;">
-	<div class="b2" style="margin-left: -7px;">
+	<div class="b2" style="margin-left: -3px;">
 	<input type="button" name="vorschau" value="Vorschau"/>
     <input type="submit" value="Importieren" name="submit">
 	</div>
@@ -189,8 +187,8 @@ upload button name in importieren -->
 <style>
 
 /** Hintergrund  **/
-body {
-	background-color: #fefefe ;}
+body { background-color: #F0F0F1
+	}
 
 blockquote{blockquote {
    padding: 5px;
