@@ -19,7 +19,7 @@
 			}
 			</script> -->
 
- <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; "> 
+ <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; background-color:white"> 
 
 <link rel="shortcut icon" href="//moodle.hwr-berlin.de/pluginfile.php/1/theme_boost_campus/favicon/1539771992/favicon.png" />
 </head>
@@ -30,7 +30,7 @@
 	</blockquote>
 
 
- <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; ">	
+ <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; background-color:white">	
  <div class="menu" style="margin-left:20px;color:#4A4D50;">
 	<h1>Admin-Portal der Hochschule f&uumlr Wirtschaft und Recht</h1>
 	<br>
@@ -86,7 +86,7 @@
 
 /** Hintergrund  **/
 body {
-	background-color: #fefefe ;}
+	background-color: #F0F0F1 ;}
 
 blockquote{blockquote {
    padding: 5px;
