@@ -106,8 +106,7 @@
 					echo $mydir;
 					?>
 		</select>
-		<input type="submit" name="publish" value="Freigebenen" />
-		</form>
+		
 		
 		<?php
 			if(isset($_POST['publish'])){
@@ -116,7 +115,10 @@
 		?>
                     
 		<!css ist unten zu finden - postionierung etc.!>
-		<div id="calendar"></div>				
+		<div id="calendar"></div>
+
+		<input type="submit" name="publish" value="Freigebenen" />
+		</form>
 				
     </body>
     
