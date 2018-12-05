@@ -23,7 +23,7 @@
 	
 	#Array mit zu verwendenen Farben
 	#https://www.w3schools.com/cssref/css_colors.asp
-	$color_array = array("red", "blue", "gold", "green", "orange", "brown");
+	$color_array = array("#ffdfdf", "#e0e1ff", "#fff4e0", "#ddffe5", "#fbecec", "#d6e4f9", "#d9fcff", "#f4f4f4", "#e8ffe5", "#faffe0", "#e5e5e5", "#fff6f6", "#ffdcdc", "#e1c5c5", "#eeeeee");
 	
 	#Start-Funktion für die Routine zur Erstellung von JSON-Dateien
 	#Input:		$file_name - Name einer hochgeladene CSV-Datei
