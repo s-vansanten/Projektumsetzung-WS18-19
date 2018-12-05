@@ -3,10 +3,12 @@
 	#include 'php/create_ics.php';
 ?>
     <body>
-		<span>Verwaltungsinformatik:</span>
+		
                 <!dropdown-menu
                 <!fürs dropdown muss noch ne eigene css-formatierung angelegt werden!>
-		<select id="dropdown" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
+		<form  method="post" enctype="multipart/form-data">
+		<span>Verwaltungsinformatik:</span>
+		<select id="dropdown" name="dropdown" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
                     <?php
 					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
@@ -104,6 +106,14 @@
 					echo $mydir;
 					?>
 		</select>
+		<input type="submit" name="publish" value="Freigebenen" />
+		</form>
+		
+		<?php
+			if(isset($_POST['publish'])){
+				rename("events/".$_POST['dropdown'], "public/".$_POST['dropdown']);
+			}			
+		?>
                     
 		<!css ist unten zu finden - postionierung etc.!>
 		<div id="calendar"></div>				

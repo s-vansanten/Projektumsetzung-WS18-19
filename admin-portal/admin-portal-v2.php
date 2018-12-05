@@ -67,108 +67,7 @@ upload button name in importieren -->
 <div id="test" style="display: none;">
 	<?php
 		include 'admin_calendar.php';
-	?>
-	
-	<form  method="post" enctype="multipart/form-data">
-	<select id="publish" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
-                    <option value="Semester" data-feed=""selected>Semester wählen</option>
-                    <?php
-					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir2 = "events/";
-					$handle2 = opendir($dir2);
-					while (false !== ($file2 = readdir($handle2))) {
-						$files2[] = $file2;
-					}
-					closedir($handle2);
-					sort($files2);	
-					
-
-					#TODO: Hier Aussortierung von Dateien, welche nicht mehr notwendig sind
-					#das heißt: keine Datei von alten Semester
-					foreach($files2 as $entry){
-						if(is_file($dir2.$entry)){
-							$entry_year = array();
-							preg_match('/[0-9][0-9][0-9][0-9]/', $entry ,$entry_year);
-							$entry_year = $entry_year[0];							
-							
-							$entry_sem = array();
-							preg_match('/[0-9][.]/', $entry ,$entry_sem);						
-							$entry_sem = $entry_sem[0];
-							$entry_sem = $entry_sem+0;
-							
-							$entry_major = array();
-							preg_match('/[A-Z][A-Z]/', $entry ,$entry_major);
-							$entry_major = $entry_major[0];
-							
-							#Entry_Year != Year (Bsp: 2017 != 2018) ODER Entry_Year != Jetzt-3Monate (Bsp: es ist März 2019, es gilt aber weiter 2018 ungerade Semester)
-							if($entry_year != date("Y") OR $entry_year != date("Y", time()-7889400)){
-								$key = array_search($entry,$files2);
-								if($key!==false){
-									unset($files2[$key]);
-								}
-							}
-							
-							#Oktober bis März => lösche gerade Semester
-							if(date("n")>= 10 OR date("n")<4){
-								#TODO: Hier falsch gecodet fürs Beispiel!!! == auf != ändern
-								if($entry_sem %2 != 0){
-									$key = array_search($entry,$files2);
-									if($key!==false){
-										unset($files2[$key]);
-									}
-								}	
-							}
-							#April bis September => lösche ungerade Semester
-							else if(date("n")>= 4 && date("n")<10){
-								if($entry_sem %2 != 0){
-									$key = array_search($entry,$files2);
-									if($key!==false){
-										unset($files2[$key]);
-									}
-								}	
-							}
-						}
-					}
-					
-					$counter = 0;
-					foreach ($files2 as $val) {
-						if (is_file($dir2.$val)) { // show only "real" files2
-							$mydir2 .= '
-							<option value="'.$val.'" data-feed="'.$dir2.$val.'"';
-							
-							#TODO: Hier Namensanpassung
-							#Schema: VI_2018_2.json
-							
-							$name = "";
-							
-							$val_year = array();
-							preg_match('/[0-9][0-9][0-9][0-9]/', $val ,$val_year);
-							$val_year = $val_year[0];							
-							
-							$val_sem = array();
-							preg_match('/[0-9][.]/', $val ,$val_sem);						
-							$val_sem = $val_sem[0];
-							$val_sem = $val_sem+0;
-							
-							$val_major = array();
-							preg_match('/[A-Z][A-Z]/', $val ,$val_major);
-							$val_major = $val_major[0];
-							
-							if($val_major == "VI"){
-								$name .= "Verwaltungsinformatik ";
-							}
-							
-							$name .= $val_sem.". Semester ".$val_year;
-							
-							
-							$mydir2 .= '>'.$name.'</option>';
-							$counter++;
-						}
-					}					
-					echo $mydir2;
-					?>
-		</select>
-		<input type="submit" value="Freigebenen" name="start_puplish">
+	?>			
 </div>
 
 <script language="javascript">
@@ -185,14 +84,7 @@ upload button name in importieren -->
 
             ele.style.display = "block";
         }
-    }	
-		
-	
-	<?php
-			if(isset($_POST['start_puplish'])){
-				rename("events/".$_POST['publish'], "public/".$_POST['publish']);
-			}
-	?>
+    }
 </script>
 
 <?php
