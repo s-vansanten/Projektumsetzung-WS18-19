@@ -48,7 +48,7 @@
 			$post .= 'BEGIN:VEVENT'.$eol.
 				'DTSTART;TZID=BerlinTime:'.date('Ymd', strtotime($entry['start'])).'T'.date('His', strtotime($entry['start'])).$eol.
 				'DTEND;TZID=BerlinTime:'.date('Ymd', strtotime($entry['end'])).'T'.date('His', strtotime($entry['end'])).$eol.
-				'LOCATION:PLATZHALTER'.$eol.
+				'LOCATION:'.$entry['location'].$eol.
 				'UID:'.md5($entry['start']).$eol.
 				'DTSTAMP:'.date('Ymd').'T'.date('His').$eol.
 				'SUMMARY:'.$entry['title'].$eol.

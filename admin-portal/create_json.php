@@ -322,6 +322,8 @@
 					$title = $csv[$row]['Modul'];
 					$start_time	= setTimestamp($row, $kw_start, NULL, "1", $csv, $year);
 					$end_time = setTimestamp($row, $kw_start, NULL, "2", $csv, $year);
+					$location = $csv[$row]['Raum'];
+					$textColor = "black";
 					#Abfragen, ob auch in der Sondertermin-Spalte ein Wert steht
 					if($csv[$row]['Sondertermine'] != NULL){
 						$sonder_catch = $csv[$row]['Sondertermine'];
@@ -329,7 +331,7 @@
 						$sonder_catch = NULL;
 					}
 					
-					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch, 'id'=>$id, 'color'=>$color);
+					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 					#Fall: Extra-Info steht in LV-Start, hier Turnus
 					if(strlen((string)(float) filter_var($kw_start, FILTER_SANITIZE_NUMBER_FLOAT)) != 2){
 						$posts = array_merge($posts, create_returning($modul_entry_start, 2, $year, $feiertage));
@@ -378,6 +380,8 @@
 		$title = $entry['title'];
 		$id = $entry['id'];
 		$color = $entry['color'];
+		$textColor = $entry['textColor'];
+		$location = $entry['location'];
 			
 		while($end_lecture_time > $modul_start_date){			
 			
@@ -403,11 +407,11 @@
 						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries[0][$i].".".$year))){
 							$new_modul_start_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_start_date));
 							$new_modul_end_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_end_date));
-							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color);
+							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 						}
 					}
 				}else{
-					$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color);
+					$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 				}								
 			}			
 			
@@ -447,12 +451,14 @@
 		#Titel-Deklaration des Moduls
 		$title = $csv[$row]['Modul'];
 		$color = $color_array[$id];
+		$textColor = "black";
+		$location = $csv[$row]['Raum'];
 		
 		#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
 		foreach ($sondertermine_array as $entry){
 			$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year);
 			$end_time = setTimestamp($row, NULL, $entry, "2", $csv, $year);			
-			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color);
+			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 		}		
 		
 		#Rückgabe von Event-Einträgen
@@ -466,19 +472,19 @@
 				
 		$posts = array();
 		
-		$posts[] = array('title'=> 'Neujahr','start'=>date("Y-m-d", mktime(0,0,0,1,1,$year)),'end'=>date("Y-m-d", mktime(0,0,0,1,1,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Neujahr','start'=>date("Y-m-d", mktime(0,0,0,1,1,$year+1)),'end'=>date("Y-m-d", mktime(0,0,0,1,1,$year+1)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Karfreitag','start'=>date("Y-m-d", strtotime("-2 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("-2 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Ostersonntag','start'=>date("Y-m-d", easter_date($year)),'end'=>date("Y-m-d", easter_date($year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Ostermontag','start'=>date("Y-m-d", strtotime("+1 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+1 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Tag der Arbeit','start'=>date("Y-m-d", mktime(0,0,0,5,1,$year)),'end'=>date("Y-m-d", mktime(0,0,0,5,1,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Christi Himmelfahrt','start'=>date("Y-m-d", strtotime("+39 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+39 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Pfingstsonntag','start'=>date("Y-m-d", strtotime("+49 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+49 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Pfingstmontag','start'=>date("Y-m-d", strtotime("+50 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+50 day",easter_date($year))), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Tag der Deutschen Einheit','start'=>date("Y-m-d", mktime(0,0,0,10,3,$year)),'end'=>date("Y-m-d", mktime(0,0,0,10,3,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> 'Heiligabend','start'=>date("Y-m-d", mktime(0,0,0,12,24,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,24,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> '1. Weihnachtstag','start'=>date("Y-m-d", mktime(0,0,0,12,25,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,25,$year)), 'allDay'=>true, 'color'=>'red');
-		$posts[] = array('title'=> '2. Weihnachtstag','start'=>date("Y-m-d", mktime(0,0,0,12,26,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,26,$year)), 'allDay'=>true, 'color'=>'red');
+		$posts[] = array('title'=> 'Neujahr','start'=>date("Y-m-d", mktime(0,0,0,1,1,$year)),'end'=>date("Y-m-d", mktime(0,0,0,1,1,$year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Neujahr','start'=>date("Y-m-d", mktime(0,0,0,1,1,$year+1)),'end'=>date("Y-m-d", mktime(0,0,0,1,1,$year+1)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Karfreitag','start'=>date("Y-m-d", strtotime("-2 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("-2 day",easter_date($year))), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Ostersonntag','start'=>date("Y-m-d", easter_date($year)),'end'=>date("Y-m-d", easter_date($year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Ostermontag','start'=>date("Y-m-d", strtotime("+1 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+1 day",easter_date($year))), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Tag der Arbeit','start'=>date("Y-m-d", mktime(0,0,0,5,1,$year)),'end'=>date("Y-m-d", mktime(0,0,0,5,1,$year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Christi Himmelfahrt','start'=>date("Y-m-d", strtotime("+39 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+39 day",easter_date($year))), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Pfingstsonntag','start'=>date("Y-m-d", strtotime("+49 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+49 day",easter_date($year))), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Pfingstmontag','start'=>date("Y-m-d", strtotime("+50 day",easter_date($year))),'end'=>date("Y-m-d", strtotime("+50 day",easter_date($year))), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Tag der Deutschen Einheit','start'=>date("Y-m-d", mktime(0,0,0,10,3,$year)),'end'=>date("Y-m-d", mktime(0,0,0,10,3,$year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> 'Heiligabend','start'=>date("Y-m-d", mktime(0,0,0,12,24,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,24,$year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> '1. Weihnachtstag','start'=>date("Y-m-d", mktime(0,0,0,12,25,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,25,$year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
+		$posts[] = array('title'=> '2. Weihnachtstag','start'=>date("Y-m-d", mktime(0,0,0,12,26,$year)),'end'=>date("Y-m-d", mktime(0,0,0,12,26,$year)), 'allDay'=>true, 'color'=>'red', 'location'=>"Berlin");
 		
 		return $posts;
 	}
