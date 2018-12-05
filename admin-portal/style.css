@@ -1,10 +1,13 @@
 body {
-	font-family: Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	margin:0; 
 	padding:0;
 	background-image: url(../test/images/background.jpg);
 	background-position: center center; 
 	background-attachment: fixed;
+ background-color: #F0F0F1;
+	
+
 	
 }
 
@@ -33,7 +36,9 @@ logo{
 	position:absolute;
 	left:30%;
 	top:0;
-	display:block; 
+	display:block;
+border-color: black;	
+	
 }
 
 nav, nav > ul {
@@ -75,11 +80,102 @@ nav a {
   display: block;
   padding: 0.4em;
   text-decoration: none; 
-  font-weight: bold;
+  font-weight: normal;
   text-align: center;
   border: 1px solid lightgrey;
-  border-radius: 10px;
-  box-shadow: 0 5px 10px white inset;
+  border-radius: 5px;
+  /*box-shadow: 0 5px 10px white inset;*/
+  color: black; 
+  background-color: lightgrey; 
+  transition: all .25s ease-in;	  
+}
+
+nav li[aria-current] a {
+  background-color: lightred; 
+  color: black;
+}
+	
+nav a:focus,
+nav a:hover,
+nav li  a:focus,
+nav li  a:hover {    
+  color: lightgrey; 
+  background-color: black;
+}	
+
+	/**Navigation**/ 
+navigation{
+	position: fixed;
+	width:100%;
+	background-color: rgba(255,255,255,0.85);
+	bottom:0;
+	left: 0; 
+	display: block;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+	z-index: 100;
+}
+
+	/**Logo**/
+logo{
+	background-image:url(../Test/images/logo.svg);
+	background-repeat:no-repeat;
+	background-size:100% auto;
+	background-position:center center;
+	width:40%;
+	height:80%;
+	position:absolute;
+	left:30%;
+	top:0;
+	display:block; 
+	
+}
+
+nav, nav > ul {
+  margin: 0;
+  padding: 0;
+} 
+
+nav  li {
+  list-style:none;
+  font-size: 1.5em;  
+  position: relative;
+  margin: 0 0 .2em 0; 
+  padding: 0;
+  width: 12em;
+}
+
+nav ul ul {
+  position: absolute;
+  top: -0.6em; 
+  left: 10em;
+  font: 0/0 serif;/* Unternavigation ausblenden */
+  z-index: -1;
+  transition: font 0.5s;
+}
+
+  nav ul li:hover ul,
+  nav ul a:focus ~ ul   {
+    font: inherit;
+    z-index: auto;                   /*  Unternavigation einblenden */
+  }
+
+@media (min-width: 45em) {
+  nav li {
+	font-size: 1em;
+  }  
+}
+
+nav a {
+  display: block;
+  padding: 0.4em;
+  text-decoration: none; 
+  font-weight: normal;
+  text-align: center;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  /*box-shadow: 0 5px 10px white inset;*/
   color: black; 
   background-color: lightgrey; 
   transition: all .25s ease-in;	  
@@ -99,16 +195,17 @@ nav li  a:hover {
 }	
 button {
 display: block;
-  padding: 0.4em;
+  padding: 0.7em;
   text-decoration: none; 
   font-weight: bold;
   text-align: center;
   border: 1px solid firebrick;
-  border-radius: 10px;
-  box-shadow: 0 5px 10px white inset; 
+  border-radius: 3px;
+ /* box-shadow: 0 5px 10px white inset; */
   transition: all .25s ease-in;	
-   color: black; 
+   color: white; 
   background-color: firebrick;
+    margin: 0 0 1.0em .5em;
 }
   /* Gestaltung, wenn Button mit Maus oder Tastatur ausgewählt ist */
 button:hover,
@@ -118,5 +215,101 @@ button:focus {
   /* Gestaltung, wenn Button gedrückt ist */
 button:active {
   ...
+}
+
+input{
+    margin: 0 0 1.0em .5em;
+}
+
+span{
+    margin: 0,5cm;
+}
+  /* Gestaltung, wenn Button mit Maus oder Tastatur ausgewählt ist */
+button:hover,
+button:focus {
+  ...
+}
+  /* Gestaltung, wenn Button gedrückt ist */
+button:active {
+  ...
+}
+
+input{
+    margin: 0 0 1.0em .5em;
+}
+
+span{
+    margin: 0,5cm;
+}  
+
+
+/* Überschrift Login*/
+menu1{
+	margin-left:20px;
+	
+}
+
+/* Buttons Login */
+menu2 {
+	margin-left:10px;
+	
+}
+
+
+
+blockquote{ {
+   padding: 5px;
+   margin-top: 5px;
+   width: 80%;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1.2em;
+   font-family: UnBatang, FreeSerif, Georgia, serif;
+   font-size: 1.2em;
+   background-color: white;
+}
+blockquote i {
+   color: blue;
+}
+}
+
+
+/* Button Kalender anzeigen (?) */
+bc {
+margin-left:34px;
+	}
+
+
+/** Hintergrund (?) **/
+body { background-color: #F0F0F1
+	}
+	
+	/* Abmeldebutton */
+	logoutbutton { 
+	 float: right;
+	 margin-right:50px; 
+	 margin-top: 10px;"
+	}
+	
+	/* Vorschau und Importieren Button*/
+buttons { 
+margin-left:10px
+}	
+
+/*Vorlesungszeiten Menü*/
+menu { 
+margin-left:10px;
+}
+
+/* Button Datei auswählen*/
+button { 
+margin-left:9px;
+}
+
+
+/* Überschrift Interaktives Vorlesungsverzeichnis*/
+ü { 
+"margin-left: 10px; 
+color:#6B6F73;
 }
   
