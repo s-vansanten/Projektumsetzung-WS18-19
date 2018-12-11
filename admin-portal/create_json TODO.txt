@@ -1,0 +1,10 @@
+Abzufangende Fälle:
+
+LV-Start set, jedoch 03. KW bis 08. KW oder 40. KW bis 02. KW
+
+LV-Start set, Sondertermin set, Nicht 21.11., dafür 28.11 14 bis 18 Uhr   bei Turnus 1 Woche
+
+LV-Start not-set, Sondertermin 09.02. bis 13.15 oder 16.02. bis 11.20 
+
+			oder Do: 41. KW bis 04. KW, Mo: 29.10., 05.11., 12.11. nicht 08.11., 20.12., dafür: 05.12. 15 bis 19 Uhr, 17.12. 11 bis 15 Uhr 
+				 --> Zeitanpassung für bestimmte Sonderterminen
