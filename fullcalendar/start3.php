@@ -70,7 +70,7 @@
 					foreach ($files as $val) {
 						if (is_file($dir.$val)) { // show only "real" files
 							$mydir .= '
-							<option value="'.$dir.$val.'" data-feed="'.$dir.$val.'"';
+							<option value="'.$val.'" data-feed="'.$dir.$val.'"';
 							
 							#TODO: Hier Namensanpassung
 							#Schema: VI_2018_2.json
@@ -108,108 +108,12 @@
 		<!css ist unten zu finden - postionierung etc.!>
 		<div id="calendar"></div>
 		
-		<span>Download ICS:</span>
+		<span>Download static ICS:</span>
+		<button id="download" onClick="download(dropdown.value)">DOWNLOAD TEST</button>
 		
-		<select id="download" onChange="download(this.value)" style="font-size: 16px;background-color:#dc1010;color:white;font-family: Arial,sans-serif;font-weight: bold;margin-top:120px;">
-                    <option value="Semester2" >Semester wählen</option>
-                    <?php
-					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir2 = "../admin-portal/ics/";
-					$handle2 = opendir($dir2);
-					while (false !== ($file2 = readdir($handle2))) {
-						$files2[] = $file2;
-					}
-					closedir($handle2);
-					sort($files2);
-
-					#TODO: Hier Aussortierung von Dateien, welche nicht mehr notwendig sind
-					#das heißt: keine Datei von alten Semester
-					#TODO: Hier Aussortierung von Dateien, welche nicht mehr notwendig sind
-					#das heißt: keine Datei von alten Semester
-					foreach($files2 as $entry){
-						if(is_file($dir2.$entry)){
-							$entry_year = array();
-							preg_match('/[0-9][0-9][0-9][0-9]/', $entry ,$entry_year);
-							$entry_year = $entry_year[0];							
-							
-							$entry_sem = array();
-							preg_match('/[0-9][.]/', $entry ,$entry_sem);						
-							$entry_sem = $entry_sem[0];
-							$entry_sem = $entry_sem+0;
-							
-							$entry_major = array();
-							preg_match('/[A-Z][A-Z]/', $entry ,$entry_major);
-							$entry_major = $entry_major[0];
-							
-							#Entry_Year != Year (Bsp: 2017 != 2018) ODER Entry_Year != Jetzt-3Monate (Bsp: es ist März 2019, es gilt aber weiter 2018 ungerade Semester)
-							if($entry_year != date("Y") OR $entry_year != date("Y", time()-7889400)){
-								$key = array_search($entry,$files2);
-								if($key!==false){
-									unset($files2[$key]);
-								}
-							}
-							
-							#Oktober bis März => lösche gerade Semester
-							if(date("n")>= 10 OR date("n")<4){
-								#TODO: Hier falsch gecodet fürs Beispiel!!! == auf != ändern
-								if($entry_sem %2 != 0){
-									$key = array_search($entry,$files2);
-									if($key!==false){
-										unset($files2[$key]);
-									}
-								}	
-							}
-							#April bis September => lösche ungerade Semester
-							else if(date("n")>= 4 && date("n")<10){
-								if($entry_sem %2 != 0){
-									$key = array_search($entry,$files2);
-									if($key!==false){
-										unset($files2[$key]);
-									}
-								}	
-							}
-						}
-					}
-					
-					$counter2 = 0;
-					foreach ($files2 as $val2) {
-						if (is_file($dir2.$val2)) { // show only "real" files
-							$mydir2 .= '
-							<option value="'.$dir2.$val2.'"';
-							
-							#TODO: Hier Namensanpassung
-							#Schema: VI_2018_2.ics
-							
-							$name2 = "";
-							
-							$val2_year = array();
-							preg_match('/[0-9][0-9][0-9][0-9]/', $val2 ,$val2_year);
-							$val2_year = $val2_year[0];							
-							
-							$val2_sem = array();
-							preg_match('/[0-9][.]/', $val2 ,$val2_sem);						
-							$val2_sem = $val2_sem[0];
-							$val2_sem = $val2_sem+0;
-							
-							$val2_major = array();
-							preg_match('/[A-Z][A-Z]/', $val2 ,$val2_major);
-							$val2_major = $val2_major[0];
-							
-							if($val2_major == "VI"){
-								$name .= "Verwaltungsinformatik ";
-							}
-							
-							$name2 .= $val2_sem.". Semester ".$val2_year;
-							
-							$mydir2 .= '>'.$name2.'</option>';
-							$counter2++;
-						}
-					}					
-					echo $mydir2;
-					?>
-		</select>
-				
-				
+		<span>Download spezific ICS:</span>
+		<button id="download" onClick="download2()">DOWNLOAD TEST</button>
+		
     </body>
     
     <head>
@@ -263,10 +167,21 @@
                 //Übertragung feed auf selected feed, welches bei Eventsource benutzt wird
                 selectedFeed = feed;
                 };
-				
+			
+		
 		function download(d){
-			if(d == 'Semester2') return;
+			if(d == 'Semester') return;
+			
+			d = d.replace("json", "ics");
+			d = "../admin-portal/ics/"+d;
 			window.location = d;
+		}
+		
+		function download2(){
+			//clientEvents liefert nur die derzeit angezeigten Events
+			//d = $('#calendar').fullCalendar('clientEvents');
+			d = $('#calendar').fullCalendar('getEventSources');			
+			window.alert(d.toString());
 		}
 		</script>
 	
