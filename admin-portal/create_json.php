@@ -119,7 +119,17 @@
 	#			$csv - Array der Module, aus CSV importiert und formatiert
 	#			$year - Jahr
 	function setTimestamp ($row, $week, $date_string, $start_or_end, $csv, $year){
-
+				
+		#Routine zum Anpassen der Jahres-Zahl für Sondertermine von Januar bis Ende März
+		if($date_string != NULL){
+			#Splitten der Zahl aus der Zeitspalte
+			#aus XX.YY wird [0]=XX und [1]=YY
+			$date_splited = explode(".", $date_string);
+			if($date_splited[1] < 4){
+				$year++;
+			}
+		}
+		
 		#Variable wird verändert, wenn $date_string != NULL und der Tag direkt berechnet werden kann
 		$dayOfWeek = 0;	
 		#Variable wird verändert, wenn $week != NULL und der Tag somit über die Kalenderwoche berechnet wird		
@@ -144,15 +154,15 @@
 		}
 		#Berechnung des Tages aus dem übergeben Datum
 		else if($week == NULL){
-			#Get weekday from date
-			$date = strtotime($date_string.".".$year);
+			#Get weekday from date			
+			$date = strtotime($date_string."".$year);
 			$dayOfWeek = date("N", $date);
 		}
 		#Fehler-Abfangung
 		else{
 			echo 'Funktion "setTimestamp" falsch aufgerufen';
 			return;
-		}
+		}		
 		
 		#Bestimmung, ob $dayOfWeek geändert wurde und wenn ja auf welchen Wert oder welche Spalte mit Startzeiten einen Wert enthält, sollte $dayOfWeek unverändert sein
 		#$week_day beinhaltet wieviele Tage nach Montag der Timestamp gesetz werden soll
@@ -163,7 +173,7 @@
 			}else if($start_or_end == "2"){
 				$time = $csv[$row]['Mo E'];
 			}
-		}else if($dayOfWeek == "2" OR$csv[$row]['Di B'] != NULL){
+		}else if($dayOfWeek == "2" OR $csv[$row]['Di B'] != NULL){
 			$week_day = "1";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Di B'];
@@ -262,10 +272,20 @@
 		
 		
 		#Herausfiltern, welche Studiengänge und dazugehörige Semester alle in der CSV-Datei vertreten sind
-		$entries = array();
+		$entries = array();		
 		foreach ($csv as $key => $values){
-			if ( !(in_array_r(array('Studgang'=>$values['Studgang'], 'Sem'=>$values['Sem']), $entries)) && $values['Studgang'] != NULL){
+			#Problematik an dieser Stelle:
+			#Bei der neuen CSV-Datei kam es beim Associative Array zum Problem, dass der Schlüssel "Studgang" nicht gefunden wurde
+			#Deshalb wird hier für den Fall, dass das Associative Array Probleme macht, für den Studiengang einfach das erste Element verwendet
+			#Folgeproblematik entsteht, wenn der Studiengang in der CSV nicht in der ersten Spalte steht
+			if(array_key_exists('Studgang', $values)){
+				if ( !(in_array_r(array('Studgang'=>$values['Studgang'], 'Sem'=>$values['Sem']), $entries)) && $values['Studgang'] != NULL){
 				array_push($entries, array('Studgang'=>$values['Studgang'], 'Sem'=>$values['Sem']));
+				}
+			}else{
+				if ( !(in_array_r(array('Studgang'=>array_values($values)[0], 'Sem'=>$values['Sem']), $entries)) && array_values($values)[0] != NULL){
+				array_push($entries, array('Studgang'=>array_values($values)[0], 'Sem'=>$values['Sem']));
+				}
 			}
 		}
 		
@@ -301,7 +321,7 @@
 				$kw_start = $csv[$row]['LV-Start'];
 				
 				#Ließt die Spalte "Modul" aus und extrahiert die Modul-Nummer (Schema XYz - X = Zahl, Y = Zahl, z = kleiner Buchstabe oder Leerstelle)
-				preg_match('/[0-9]+[0-9]+[a-z\ ]/', utf8_encode($csv[$row]['Modul']) ,$modul_token);
+				preg_match('/[0-9][0-9][a-z\ ]/', utf8_encode($csv[$row]['Modul']) ,$modul_token);
 				$modul_token = $modul_token[0];
 				
 				#Überprüfen, ob für die Modul-Nummer schon ein ID gesetzt wurde
@@ -391,23 +411,30 @@
 				#nicht 09.06., dafür 16.06.
 				if($entry['sonder_catch'] != NULL){
 					$sonder_catch_entries;
-					preg_match_all('/nicht +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[0]);
-					preg_match_all('/dafür +[0-9]+[0-9]+[.]+[0-9]+[0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[1]);
+					preg_match_all('/nicht [0-9][0-9][.][0-9][0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[0]);
+					preg_match_all('/dafür [0-9][0-9][.][0-9][0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[1]);
 					$sonder_catch_entries[0] = $sonder_catch_entries[0][0];
-					$sonder_catch_entries[1] = $sonder_catch_entries[1][0];
+					$sonder_catch_entries[1] = $sonder_catch_entries[1][0];				
 					
 					for($i = 0; $i < count($sonder_catch_entries[0]); $i++){
 						$sonder_catch_entries[0][$i] = preg_replace('/nicht /', '', $sonder_catch_entries[0][$i]);
 					}
 					for($i = 0; $i < count($sonder_catch_entries[1]); $i++){
 						$sonder_catch_entries[1][$i] = preg_replace('/dafür /', '', $sonder_catch_entries[1][$i]);
-					}					
+					}
 					
 					for($i = 0; $i<count($sonder_catch_entries[0]); $i++){
 						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries[0][$i].".".$year))){
-							$new_modul_start_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_start_date));
-							$new_modul_end_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_end_date));
-							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
+							#FALL: nicht XX.XX , dafür YY.YY
+							if(!empty($sonder_catch_entries[1])){
+								$new_modul_start_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_start_date));
+								$new_modul_end_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_end_date));
+								$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
+							}
+							#FALL: nicht XX.XX [ohne YY.YY]
+							else{
+								
+							}
 						}
 					}
 				}else{
@@ -441,7 +468,7 @@
 		$sondertermine_plan_text = $csv[$row]['Sondertermine'];	
 		
 		#Funktion such nach dem verwendeten Datumsschema im Eintrag von Sonderterminen und speichert diese in einem Array
-		preg_match_all('/[0-9]+[0-9]+[.]+[0-9]+[0-9]/', $sondertermine_plan_text ,$sondertermine_array);
+		preg_match_all('/[0-9][0-9][.][0-9][0-9][.]/', $sondertermine_plan_text ,$sondertermine_array);
 		#Reduzierung des drei-dimensonalen Arrays in ein zwei-dimensonales Array 
 		$sondertermine_array = $sondertermine_array[0];
 		
