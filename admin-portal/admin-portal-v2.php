@@ -1,10 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link href='../admin/style/style.css' rel='stylesheet' />
+<link href='../admin-portal/style/style.css' rel='stylesheet' />
+
 <title>Admin-Portal der HWR</title>
 <script>
-	
+
 </script>
 </head>
 <body>
@@ -43,16 +44,27 @@ upload button name in importieren -->
 <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;">
 <br> </br>
 
+<div class="tooltip">
+  <span class="tooltiptext">Test</span>
+</div>
+
 <!-- Datei auswählen Button -->
 	<form  method="post" enctype="multipart/form-data">
     <!-- Select CSV file to upload and create JSON files from: -->
     <input type="file" name="fileToUpload" id="fileToUpload">
 	<div class="menu" style="margin-left:10px;">
+	<div class="tooltip">
+		<span class="tooltiptext">Letzter Vorlesungstag erforderlich</span>
+	</div>
+
 	<p>Letzer Vorlesungstag : <input type="date" name="end_lecture_time_input" /></p>
 	<p>Start Vorlesungspause : <input type="date" name="lecture_free_time_start_input" /></p>
 	<p>Ende Vorlesungspause : <input type="date" name="lecture_free_time_end_input" /></p>
 	</div>
 	<div class="buttons" style="margin-left:10px;">
+	<div class="tooltip">
+		<span class="tooltiptext">Datei hochladen</span>
+	</div>
 	<div class="b2" style="margin-left: -7px;">
     <input type="submit" value="Importieren" name="submit">
 	</div>
@@ -63,6 +75,8 @@ upload button name in importieren -->
 <br>
 
 <input type="button" id="test_start" value='Show Layer' onclick="javascript:toggle();";>
+
+
 
 <div id="test" style="display: none;">
 	<?php
@@ -223,6 +237,9 @@ blockquote i {
 title{
 	text-align: center;
 }
+
+<!--><-->
+
 
 	
 </style>
