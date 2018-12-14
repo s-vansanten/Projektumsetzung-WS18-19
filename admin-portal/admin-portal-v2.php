@@ -1,10 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link href='../admin/style/style.css' rel='stylesheet' />
+<link href='../admin-portal/style/style.css' rel='stylesheet' />
+
 <title>Admin-Portal der HWR</title>
 <script>
-	
+
 </script>
 </head>
 <body>
@@ -20,7 +21,7 @@
 </form> 
 
 
- <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;"> 
+ <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; background-color:white;"> 
 <!-- admin portal zur studienplanung als überschrift,
 upload button name in importieren -->
 <figure> <img src="https://upload.wikimedia.org/wikipedia/de/9/90/Hochschule_f%C3%BCr_Wirtschaft_und_Recht_Berlin_logo.svg" width="604" height="120"
@@ -40,19 +41,30 @@ upload button name in importieren -->
  </blockquote>  
  
  
-<blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px;">
+<blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; background-color:white">
 <br> </br>
+
+<div class="tooltip">
+  <span class="tooltiptext">Test</span>
+</div>
 
 <!-- Datei auswählen Button -->
 	<form  method="post" enctype="multipart/form-data">
     <!-- Select CSV file to upload and create JSON files from: -->
     <input type="file" name="fileToUpload" id="fileToUpload">
 	<div class="menu" style="margin-left:10px;">
+	<div class="tooltip">
+		<span class="tooltiptext">Letzter Vorlesungstag erforderlich</span>
+	</div>
+
 	<p>Letzer Vorlesungstag : <input type="date" name="end_lecture_time_input" /></p>
 	<p>Start Vorlesungspause : <input type="date" name="lecture_free_time_start_input" /></p>
 	<p>Ende Vorlesungspause : <input type="date" name="lecture_free_time_end_input" /></p>
 	</div>
 	<div class="buttons" style="margin-left:10px;">
+	<div class="tooltip">
+		<span class="tooltiptext">Datei hochladen</span>
+	</div>
 	<div class="b2" style="margin-left: -7px;">
     <input type="submit" value="Importieren" name="submit">
 	</div>
@@ -63,6 +75,8 @@ upload button name in importieren -->
 <br>
 
 <input type="button" id="test_start" value='Show Layer' onclick="javascript:toggle();";>
+
+
 
 <div id="test" style="display: none;">
 	<?php
@@ -203,7 +217,7 @@ upload button name in importieren -->
 
 /** Hintergrund  **/
 body {
-	background-color: #fefefe ;}
+	background-color: #F0F0F1 ;}
 
 blockquote{blockquote {
    padding: 5px;
@@ -224,7 +238,11 @@ title{
 	text-align: center;
 }
 
+<!--><-->
+
+
 	
 </style>
 </body>
 <html>
+
