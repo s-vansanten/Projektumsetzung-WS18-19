@@ -69,20 +69,21 @@ upload button name in importieren -->
     <input type="submit" value="Importieren" name="submit">
 	</div>
 	</form>
-	</div>
+
 <blockquote>
 <br><br>
 <br>
 
 <input type="button" id="test_start" value='Show Layer' onclick="javascript:toggle();";>
 
-
-
-<div id="test" style="display: none;">
+	</div>
+	<div id="test" style="display: none;">
 	<?php
 		include 'admin_calendar.php';
 	?>			
 </div>
+
+
 
 <script language="javascript">
 
@@ -245,4 +246,3 @@ title{
 </style>
 </body>
 <html>
-
