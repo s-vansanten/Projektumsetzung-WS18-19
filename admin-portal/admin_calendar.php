@@ -116,16 +116,18 @@
                     
 		<!css ist unten zu finden - postionierung etc.!>
 		<div id="calendar"></div>
-
-		<input type="submit" name="publish" value="Freigebenen" />
+		
+		<input type="submit" name="publish" value="Freigeben" />
+		<!--span class="tooltip" tabindex="0" data-tooltip="Änderungen werden veröffentlicht."> ? </span-->
 		</form>
 				
     </body>
     
     <head>
                 <!nicht sicher ,ob alles gebraucht wird!>
+		<link href='../admin-portal/style/style.css' rel='stylesheet' />
 		<link rel="stylesheet" href="../fullcalendar/css/jquery-ui.min.css">
-        <link rel='stylesheet' href='../fullcalendar/fullcalendar.css' />
+        <link rel='stylesheet' href='../fullcalendar/css/fullcalendar.css' />
 		<script src='../fullcalendar/lib/jquery.min.js'></script>
 		<script src='../fullcalendar/lib/moment.min.js'></script>                       
 		<script src='../fullcalendar/fullcalendar.js'></script>
