@@ -254,7 +254,7 @@ upload button name in importieren -->
 }
 #test{
     position:absolute;
-    bottom:-1.5%;
+    bottom:-1.0%;
     left:43.5%;
     width:50%;
   /** background-color: #FFFFFF;**/

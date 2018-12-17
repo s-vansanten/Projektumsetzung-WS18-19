@@ -144,12 +144,19 @@
                 
                     locale: 'de',
                     lang: 'de',
-                    editable: false,
+                    
                     firstDay: 1,
+                      minTime: "07:00:00",
+        maxTime: "21:00:00",
+       // height: 'auto',
+        contentHeight: 400,
+        aspectRatio: 10,
+        Boolean, default: true,
+                  editable: true,
                     displayEventTime: false,
                     //Hier werden die einzelnen Events nicht wie bisher durch eine genaue .json aufgerufen ,sondern durch mein selectedFeed (aus dem dropdown)
                     eventSources: [ selectedFeed ],
-                    eventLimit: 5,
+                    eventLimit: 2,
                    //hab ein Theme (Blitzer)benutzt von https://jqueryui.com/themeroller/
                     themeSystem: 'jquery-ui',
                     header: {
