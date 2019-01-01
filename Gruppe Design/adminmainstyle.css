@@ -1,0 +1,173 @@
+/* Tooltip/Helpbox*/
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+	float:right;	
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #1E2021;;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:before{
+    content:'?';
+    font-weight: bold;
+    color:#fff;
+	background-color: #d50c2f;
+	border-radius: 15px;
+
+	
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/** Hintergrund  **/
+#body {
+	background-color: #F0F0F1;
+}
+
+#blockquote {
+   padding: 5px;
+   margin-top: 5px;
+   width: 85%;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1.2em;
+   font-family: Crimson Text Roman;
+   font-size: 0.7em;
+   background-color:#FAFAFA;
+}
+#blockquote2{
+    position:absolute;
+    padding: 5px;
+   margin-top: 5px;
+   width: 32%;
+   margin-left: 7.2%;
+   margin-right: auto;
+   bottom: 19%;
+  color:#4A4D50;
+   font-family: Crimson Text Roman;
+   font-size: 0.7em;
+   background-color:#FAFAFA;
+}
+#blockquote i {
+   color: blue;
+}
+
+#title{
+	text-align: center;
+}
+#test{
+    position:absolute;
+    bottom:-1.0%;
+    left:43.5%;
+    width:50%;
+	display: none;
+  /** background-color: #FFFFFF;**/    
+}
+/* toggle Vorschau Button */
+#test_start{
+	font-family: Crimson Text Roman;
+	font-size:1.3em;
+}
+
+#menu{
+   
+}
+#levo{
+    position:absolute;
+    left:35%;
+}
+
+#stvo{
+    position:absolute;
+    left:35%;
+}
+#evo{
+    position:absolute;
+    left:35%;
+}
+#btnimportieren	{
+    position:absolute;
+    left:1%;
+	font-family: Crimson Text Roman;
+	font-size:1.3em;
+}
+#logoutbutton{
+    position:absolute;
+    left:86%;
+    bottom:91%;
+    font-family: Crimson Text Roman;
+	float: right; 
+	margin-right:50px;
+	margin-top: 10px;
+	background-color: gray;
+}
+
+#ü1 {
+	margin-left: 26px;
+	color:#6B6F73;}
+
+#ü2 {
+	margin-left: 5px; 
+	color:#d30000;}
+
+/** Hintergrund  **/
+body {
+	background-color: #F0F0F1 ;}
+
+.b2{
+	margin-left: -7px;}
+
+.buttons{ 
+	margin-left:10px;}
+	
+.titleüberschriften{
+	margin-left:450px ;
+	margin-right:50px; 
+	margin-top: 10px; 
+	color:red;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
