@@ -2,6 +2,7 @@
 <html>
 <head>
 <link href='../admin-portal/style.css' rel='stylesheet' />
+<link href='style/adminmainstyle.css' rel='stylesheet' />
 
 <title>Admin-Portal der HWR</title>
 
@@ -10,11 +11,13 @@
 
 
 
-<form action="admin-portal-login.php" method="post" id="logout">
+<form action="admin-portal-login-presentation-v2.php" method="post" id="logout">
     <main>
-          
+        <div  >
+<button type="submit" id="logoutbutton" >Abmelden</button>
+        </div>    
     </main>
-</form> 
+</form>  
 
 
 <!-- <blockquote style="border-style: solid; border-color:#b5b5b5; border-width: 1px; background-color:white;"> -->
@@ -25,14 +28,12 @@ upload button name in importieren -->
 	alt="Logo">
 	</figure>
 <br></br>
- <div id="logoutbuttondiv" >
-<button type="submit" id="logoutbutton" style="float: right; margin-right:50px; margin-top: 10px;">Abmelden</button>
-        </div> 
-<div class="titleüberschriften" style="margin-left:450px ;margin-right:50px; margin-top: 10px; color:red;">
-<div id="ü1" style="margin-left: 26px; color:#6B6F73;">
+ 
+<div class="titleüberschriften" >
+<div id="ü1" >
 <h1>Herzlich Willkommen!</h1> 
 </div>
-<div id="ü2" style="margin-left: 5px; color:#d30000;">
+<div id="ü2" >
 <h2>Admin-Portal für die Lehrplanung</h2>
 </div>
 <br></br>
@@ -58,12 +59,12 @@ upload button name in importieren -->
 	<p style="font-size:1.3em;">Ende Vorlesungspause: <input id="evo" type="date" name="lecture_free_time_end_input" /></p>
 			<span class="tooltip" tabindex="0" data-tooltip="Bitte die Daten des Vorlesungszeitraumes eingeben"> ? </span>
 	</div>
-	<div class="buttons" style="margin-left:10px;">
+	<div class="buttons" >
 
 <br>
 	
-	<div class="b2" style="margin-left: -7px;">
-    <input id="btnimportieren"style="font-family: Crimson Text Roman;font-size:1.3em;" type="submit" value="Importieren" name="submit">
+	<div class="b2" >
+    <input id="btnimportieren" type="submit" value="Importieren" name="submit">
 
 		<!--span class="tooltip" tabindex="0" data-tooltip="Gewünschte Datei hochladen" style="float:right">?</span-->
 
@@ -75,10 +76,10 @@ upload button name in importieren -->
 <br><br>
 
 
-<input type="button" id="test_start" style="font-family: Crimson Text Roman;font-size:1.3em;" value='Vorschau' onclick="javascript:toggle();";>
+<input type="button" id="test_start"  value='Vorschau' onclick="javascript:toggle();";>
 	<span class="tooltip" tabindex="0" data-tooltip="Kalender anzeigen"> ? </span>
 	</div>
-	<div id="test" style="display: none;">
+	<div id="test">
 	<?php
 		include 'admin_calendar_presentation.php';
 	?>			
@@ -215,103 +216,5 @@ upload button name in importieren -->
 	
 ?>
 </body>
-<style>
-
-/** Hintergrund  **/
-#body {
-	background-color: #F0F0F1;
-}
-
-#blockquote {
-   padding: 5px;
-   margin-top: 5px;
-   width: 85%;
-   margin-left: auto;
-   margin-right: auto;
-   margin-bottom: 1.2em;
-   font-family: Crimson Text Roman;
-   font-size: 0.7em;
-   background-color:#FAFAFA;
-}
-#blockquote2{
-    position:absolute;
-    padding: 5px;
-   margin-top: 5px;
-   width: 32%;
-   margin-left: 7.2%;
-   margin-right: auto;
-   bottom: 19%;
-  color:#4A4D50;
-   font-family: Crimson Text Roman;
-   font-size: 0.7em;
-   background-color:#FAFAFA;
-}
-#blockquote i {
-   color: blue;
-}
-
-#title{
-	text-align: center;
-}
-#test{
-    position:absolute;
-    bottom:-1.0%;
-    left:43.5%;
-    width:50%;
-  /** background-color: #FFFFFF;**/
-   
-    
-}
-
-#menu{
-   
-}
-#levo{
-    position:absolute;
-    left:35%;
-}
-
-#stvo{
-    position:absolute;
-    left:35%;
-}
-#evo{
-    position:absolute;
-    left:35%;
-}
-#btnimportieren	{
-    position:absolute;
-    left:1%;
-}
-#logoutbutton{
-    position:absolute;
-    left:86%;
-    bottom:91%;
-    font-family: Crimson Text Roman;
-}
-/**.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-
-  
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}**/
-</style>
 
 <html>

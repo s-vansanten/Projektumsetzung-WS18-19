@@ -1,0 +1,39 @@
+/** Hintergrund  **/
+body {
+	background-color: #F0F0F1 ;}
+	
+	#blockquote3{
+   padding: 5px;
+   margin-top: 5px;
+   width: 85%;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1.2em;
+   font-family: Crimson Text Roman;
+   font-size: 0.7em;
+   background-color:#FAFAFA;
+}
+#blockquote4{
+    position:absolute;
+    padding: 5px;
+   margin-top: 5px;
+   width: 32%;
+   margin-left: 7.2%;
+   margin-right: auto;
+   bottom: 19%;
+  color:#4A4D50;
+   font-family: Crimson Text Roman;
+   font-size: 0.7em;
+   background-color:#FAFAFA;
+}
+#blockquote i {
+   color: blue;
+}
+
+.menu2 {
+	margin-left:10px;}
+	
+.menu1 {
+	margin-left:20px;
+	color:#4A4D50;
+}
