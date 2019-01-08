@@ -196,6 +196,19 @@
 					}           
 				}
 			}
+			// Events raussuchen die keine 'Ids' haben um Feiertage festzustellen, da die keine Ids haben
+			foreach ($json as $key => $value) {
+					$pruefung2 = true;
+					foreach ($value as $key => $val) {						
+						if($key == 'id'){ 	
+							$pruefung2 = false;							
+						}							
+					} 
+					if($pruefung2 == true){						
+						$zwischenJSON = json_encode($value) ;
+						$neueJSON  .= $zwischenJSON . ' , ' ;
+					}
+				}
 			$neueJSON .= ']' ;
 			//echo $neueJSON ;
 		}
