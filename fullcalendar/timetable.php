@@ -263,10 +263,14 @@ function closeNav() {
                 <script src="external/jquery/jquery.js"></script>
                 <script src="jquery-ui.min.js"></script>
 		<script>
-            
-                 //Variable selectedfeed,um einzelne selected json Dateien zu benutzen   
-				 
-				 var selectedFeed = <?php echo $neueJSON ; ?>
+                var selectedFeed = <?php echo $neueJSON ; ?>
+                </script>
+        <script>
+           
+                 //Variable selectedfeed,um einzelne selected json Dateien zu benutzen  
+                  var selectedFeed = 
+                  //es liegt am echo
+                 //Javascript und php zusammen aufgerufen??
 		//var selectedFeed = $('#dropdown').find(':selected').data('feed'); // hier!!!!!!!!!!!!!!!!!!!!!!
 		
 		
