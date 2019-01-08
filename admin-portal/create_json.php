@@ -320,9 +320,16 @@
 			if($csv[$row]['Sem'] == $stud_sem['Sem']){
 				$kw_start = $csv[$row]['LV-Start'];
 				
+				/*
 				#Ließt die Spalte "Modul" aus und extrahiert die Modul-Nummer (Schema XYz - X = Zahl, Y = Zahl, z = kleiner Buchstabe oder Leerstelle)
 				preg_match('/[0-9][0-9][a-z\ ]/', utf8_encode($csv[$row]['Modul']) ,$modul_token);
 				$modul_token = $modul_token[0];
+				
+				*/
+				
+				$modul_token = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];
+				
+				file_put_contents("test.txt", $modul_token.PHP_EOL, FILE_APPEND);
 				
 				#Überprüfen, ob für die Modul-Nummer schon ein ID gesetzt wurde
 				#Wenn ja, werdenen der ID sowie der dazugehörigen Farbe
@@ -339,7 +346,8 @@
 				
 				#Fall: LV-Start is set
 				if($kw_start != NULL){
-					$title = $csv[$row]['Modul'];
+					
+					$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];					
 					$start_time	= setTimestamp($row, $kw_start, NULL, "1", $csv, $year);
 					$end_time = setTimestamp($row, $kw_start, NULL, "2", $csv, $year);
 					$location = $csv[$row]['Raum'];
@@ -476,7 +484,7 @@
 		$posts = array();
 		
 		#Titel-Deklaration des Moduls
-		$title = $csv[$row]['Modul'];
+		$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];
 		$color = $color_array[$id];
 		$textColor = "black";
 		$location = $csv[$row]['Raum'];
