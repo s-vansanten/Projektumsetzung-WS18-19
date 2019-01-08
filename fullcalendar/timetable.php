@@ -32,7 +32,7 @@
 					#TODO: Hier Ansortierung von Dateien, welche nicht mehr notwendig sind
 					#das heißt: keine Datei von alten Semester
 					
-					/* foreach($files as $entry){
+					foreach($files as $entry){
 						if(is_file($dir.$entry)){
 							$entry_year = array();
 							preg_match('/[0-9][0-9][0-9][0-9]/', $entry ,$entry_year);
@@ -45,10 +45,10 @@
 							
 							$entry_major = array();
 							preg_match('/[A-Z][A-Z]/', $entry ,$entry_major);
-							$entry_major = $entry_major[0];
+							$entry_major = $entry_major[0];							
 							
-							#Entry_Year != Year (Bsp: 2017 != 2018) ODER Entry_Year != Jetzt-3Monate (Bsp: es ist März 2019, es gilt aber weiter 2018 ungerade Semester)
-							if($entry_year != date("Y") OR $entry_year != date("Y", time()-7889400)){
+							#Entry_Year != Year (Bsp: 2017 != 2018) UND Entry_Year != Jetzt-3Monate (Bsp: es ist März 2019, es gilt aber weiter 2018 ungerade Semester)
+							if($entry_year != date("Y") AND $entry_year != date("Y", time()-7889400)){
 								$key = array_search($entry,$files);
 								if($key!==false){
 									unset($files[$key]);
@@ -75,7 +75,7 @@
 								}	
 							}
 						}
-					} */
+					}
 					
 					$counter = 0;
 					foreach ($files as $val) {
