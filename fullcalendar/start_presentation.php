@@ -56,8 +56,7 @@
 							
 							#Oktober bis März => lösche gerade Semester
 							if(date("n")>= 10 OR date("n")<4){
-								#TODO: Hier falsch gecodet fürs Beispiel!!! == auf != ändern
-								if($entry_sem %2 != 0){
+								if($entry_sem %2 == 0){
 									$key = array_search($entry,$files);
 									if($key!==false){
 										unset($files[$key]);
@@ -101,7 +100,7 @@
 							$val_major = $val_major[0];
 							
 							if($val_major == "VI"){
-								$name .= "Verwaltungsinformatik ";
+								$name .= "";
 							}
 							
 							$name .= $val_sem.". Semester ".$val_year;
@@ -120,12 +119,7 @@
   <a href="https://www.hwr-berlin.de/" id="ahwr">HWR Homepage &#8250;</a>
    </div>
    
-    <span id="downloadspan">Download static ICS:</span>
-		<button id="download" onClick="download(dropdown.value)">DOWNLOAD</button>
-		
-		<span id="download2spezi">Download spezific ICS:</span>
-		<button id="download2" onClick="download2()">DOWNLOAD</button>
- 
+   
 </div>
   
              <span id="auswahl" onclick="openNav()">&#9776; Auswahl</span>
