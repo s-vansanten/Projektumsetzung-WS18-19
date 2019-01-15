@@ -39,7 +39,7 @@
 		#Einlesen der Datei
 		$file = file($file_name);
 		#Array aus CSV Datei erstellen
-		$csv[] = array_map(	function($v){return str_getcsv($v, detectDelimiter());}, $file);	
+		$csv[] = array_map(	function($v){return str_getcsv($v, detectDelimiter());}, $file);
 		
 		#Konvertierung in UTF8 zur Eliminierung von Problemen mit Umlauten
 		#via http://nazcalabs.com/blog/convert-php-array-to-utf8-recursively/
@@ -47,9 +47,9 @@
 		#Beim zeilenweisen Durchlaufen des Arrays in Funktion "create_json_semester" kann sich das Programm aufhängen, wenn es auf die Zeile "Module mit mehreren Schwerpunkten / Teilung LV und Übung" traf wegen dem "Ü"
 		#In der Funktion "create_returning" beim Aufruf der php-Funktion "preg_match_all" muss jetzt nicht mehr der Input in UTF8 konvertiert werden. Ohne Konvertierung kam es zu Problemen, da im Text "dafür" steht
 		array_walk_recursive($csv, function(&$item, $key){
-        if(!mb_detect_encoding($item, 'utf-8', true)){
+			if(!mb_detect_encoding($item, 'utf-8', true)){
                 $item = utf8_encode($item);
-        }
+			}
 		});
 		
 		#Löschen des durch das Einlesen erstelle obere Array (csv[0] enthält das Array mit den CSV-Daten, csv[1] existiert nicht)
@@ -113,7 +113,7 @@
 	
 	#Funktion zur Setzung eines Timestamp anhand der Übergabe der Woche und des Tages
 	#Input: 	$row - Reihe (somit Modul)
-	#			$week - Wochennummer als String (muss nicht zwinged übergeben werden, da der Wert auch durch "$csv[$row]['LV-Start']" abgerufen werden kann
+	#			$week - Wochennummer
 	#			$date_string
 	#			$start_or_end - Variable (Wert 1 oder 2, kann auf true/false angepasst werden), der bestimmt, ob die Startzeit- oder Endzeit-Spalte zur Berechnugn des Timestamps verwendet wird
 	#			$csv - Array der Module, aus CSV importiert und formatiert
@@ -134,20 +134,28 @@
 		$dayOfWeek = 0;	
 		#Variable wird verändert, wenn $week != NULL und der Tag somit über die Kalenderwoche berechnet wird		
 		$week_day = NULL;		
+				
+		#Überprüfung, ob die Kalenderwoche im nächsten Jahr liegt
+		#Kann im Wintersemester der Fall sein
+		#Wenn die Kalenderwoche kleiner 12 ist, sollte es sich in der Regel um das nächste Jahr handeln
+		if($week <= 12){
+				$year++;
+		}
 		
+		/*
 		#Extrahieren von Zahlen aus dem String
 		$week_no = (float) filter_var($week, FILTER_SANITIZE_NUMBER_FLOAT);
 		#Sollten die Zahl mehr als zwei Zeichen haben, werden alle Ziffern außer die ersten beiden gelöscht
 		#Dies kommt vor, wenn außer der Kalenderwoche auch noch Information zum Turnus (bei unser CSV 14-Tägigkeit) in der Zelle enthalten sind ((1 Jahr = 52,14 Wochen)
 		if(strlen((string)$week_no) != 2){
 			$week_no = substr($week_no, 0, 2);
-		}
+		}*/
 		
 		#Berechnen des Anfangs der Kalenderwoche über Kalenderwoche-Nummer
 		if($date_string == NULL){
 			#Berechnung des Beginn einer Kalenderwoche, Montags 0:00 Uhr
 			$week_start = new DateTime();
-			$week_start->setISODate($year,$week_no);
+			$week_start->setISODate($year,$week);
 			
 			#Umformatierung in UNIX-Timestamp zur einfachen Aufaddierung von Sekunden
 			$date = strtotime($week_start->format('Y-m-d'));
@@ -318,14 +326,7 @@
 		#json-Array erstellen
 		for ($row = 0; $row < count($csv); $row++){
 			if($csv[$row]['Sem'] == $stud_sem['Sem']){
-				$kw_start = $csv[$row]['LV-Start'];
-				
-				/*
-				#Ließt die Spalte "Modul" aus und extrahiert die Modul-Nummer (Schema XYz - X = Zahl, Y = Zahl, z = kleiner Buchstabe oder Leerstelle)
-				preg_match('/[0-9][0-9][a-z\ ]/', utf8_encode($csv[$row]['Modul']) ,$modul_token);
-				$modul_token = $modul_token[0];
-				
-				*/
+				$kw_start = $csv[$row]['LV-Start'];				
 				
 				$modul_token = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];
 				
@@ -347,9 +348,12 @@
 				#Fall: LV-Start is set
 				if($kw_start != NULL){
 					
+					#Herausfiltern der Start-Kalenderwoche für die Timestamp-Funktion
+					preg_match('/([0-9][0-9]/)', $kw_start, $kw_start_matches);
+					
 					$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];					
-					$start_time	= setTimestamp($row, $kw_start, NULL, "1", $csv, $year);
-					$end_time = setTimestamp($row, $kw_start, NULL, "2", $csv, $year);
+					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year);
+					$end_time = setTimestamp($row, $kw_start_matches[0], NULL, "2", $csv, $year);
 					$location = $csv[$row]['Raum'];
 					$textColor = "black";
 					#Abfragen, ob auch in der Sondertermin-Spalte ein Wert steht
@@ -360,13 +364,29 @@
 					}
 					
 					$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-					#Fall: Extra-Info steht in LV-Start, hier Turnus
-					if(strlen((string)(float) filter_var($kw_start, FILTER_SANITIZE_NUMBER_FLOAT)) != 2){
-						$posts = array_merge($posts, create_returning($modul_entry_start, 2, $year, $feiertage));
+					
+					#Filterung LV-Start
+					#Fall 1: ab XX. KW
+					#Fall 2: ab XX. KW, XX-tätig
+					#Fall 3: XX. KW bis YY. KW
+					
+					
+					#Fall 3:
+					if(preg_match('(/[0-9][0-9][.][ ]KW[ ]bis[ ][0-9][0-9][.][ ]KW/)', $kw_start) === 1){
+						
+						#Herausfiltern der zweiten genannten Kalenderwoche aus LV-Start
+						preg_match('/bis[ ][0-9][0-9][.][ ]KW/', $kw_start, $matches);
+						preg_match('!\d+!', $matches[0], $sub_matches);
+						
+						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, $sub_matches[0]));
 					}
-					#Fall: Normal
+					#Fall 2:
+					else if(preg_match('/ab[ ][0-9][0-9][.][ ]KW,[ ][0-9][0-9]', $kw_start) === 1){
+						$posts = array_merge($posts, create_returning($modul_entry_start, 2, $year, $feiertage, NULL));
+					}
+					#Fall 1:
 					else{
-						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage));
+						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, NULL));
 					}
 				#Fall: LV-Start not set && Sondertermine is set	
 				}else if($kw_start == NULL && $csv[$row]['Sondertermine'] != NULL ){
@@ -392,11 +412,16 @@
 	#			$turnus - Gibt den Wochenturnus an
 	#			$year - Jahr
 	#			$feiertage - Feiertage für Berlin
-	#Output: 	$returning_posts - Array aus Events vom Beginn bis zum Ende des Semesters
-	function create_returning($entry, $turnus, $year, $feiertage){
+	#			$end_kw - Kalenderwoche, in der das Modul zuletzt staatfindet - NULL wenn das Modul bis zum Ende des Semesters läuft
+	#Output: 	$returning_posts - Array aus Events vom Beginn bis zum Ende des Semesters oder bis zu einer gesetzten Kalenderwoche
+	function create_returning($entry, $turnus, $year, $feiertage, $end_kw){
 		
 		#Timestamp-Variable, welche das Ende der Vorlesungszeit setzt
 		global $end_lecture_time, $lecture_free_time_start, $lecture_free_time_end;
+		
+		echo "entry = <br/>";
+		print_r($entry);
+		echo "<br/>";
 		
 		#Array zum Abspeichern der Event-Einträge		
 		$returning_posts = array();
@@ -410,9 +435,31 @@
 		$color = $entry['color'];
 		$textColor = $entry['textColor'];
 		$location = $entry['location'];
+		
+		#Das Ende des Modul wird durch das Ende der Vorlesungszeit gesetzt oder durch eine gesetzte Kalenderwoche
+		$end_modul_time = $end_lecture_time;		
+		if($end_kw != NULL){			
+			#Überprüfung, ob die Kalenderwoche im nächsten Jahr liegt
+			#Kann im Wintersemester der Fall sein
+			#Wenn die Kalenderwoche kleiner 12 ist, sollte es sich in der Regel um das nächste Jahr handeln
+			#ALTERNATIV: Start-Termin wird um 4 Monate erhöht und das Jahr mit dem gesetzten Jahr überprüft
+			#$year != date("Y", $modul_start_date+10519200)
+			if($end_kw <= 12){
+				$end_kw_year = $year+1;
+			}else{
+				$end_kw_year = $year;
+			}			
 			
-		while($end_lecture_time > $modul_start_date){			
+			#end_kw wird um 1 erhöht, damit das Ende der Woche bestimmt wird
+			#Berechnung des Beginn einer Kalenderwoche, Montags 0:00 Uhr
+			$week_start = new DateTime();
+			$week_start->setISODate($end_kw_year,$end_kw+1);
 			
+			#Umformatierung in UNIX-Timestamp zur einfachen Aufaddierung von Sekunden
+			$end_modul_time = strtotime($week_start->format('Y-m-d'));
+		}
+			
+		while($end_modul_time > $modul_start_date){
 			#Check von Feiertagen & Check vorlesungsfreier Zeit
 			if(!in_array(date("Y-m-d", $modul_start_date), $feiertage) && !($modul_start_date>$lecture_free_time_start && $modul_start_date<$lecture_free_time_end+86400)){
 				#Check für Anpassung von Terminen durch Sondertermin-Spalte
@@ -441,8 +488,10 @@
 							}
 							#FALL: nicht XX.XX [ohne YY.YY]
 							else{
-								
+								#nichts tun
 							}
+						}else{
+							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 						}
 					}
 				}else{
