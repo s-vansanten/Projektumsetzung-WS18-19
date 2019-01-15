@@ -349,7 +349,10 @@
 				if($kw_start != NULL){
 					
 					#Herausfiltern der Start-Kalenderwoche für die Timestamp-Funktion
-					preg_match('/([0-9][0-9]/)', $kw_start, $kw_start_matches);
+					preg_match('/([0-9][0-9])/', $kw_start, $kw_start_matches);
+					
+					print_r($kw_start_matches[0]);
+					echo "<br/>";
 					
 					$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];					
 					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year);
@@ -372,16 +375,16 @@
 					
 					
 					#Fall 3:
-					if(preg_match('(/[0-9][0-9][.][ ]KW[ ]bis[ ][0-9][0-9][.][ ]KW/)', $kw_start) === 1){
+					if(preg_match('/([0-9][0-9][.][ ]KW[ ]bis[ ][0-9][0-9][.][ ]KW)/', $kw_start) === 1){
 						
 						#Herausfiltern der zweiten genannten Kalenderwoche aus LV-Start
-						preg_match('/bis[ ][0-9][0-9][.][ ]KW/', $kw_start, $matches);
+						preg_match('/(bis[ ][0-9][0-9][.][ ]KW)/', $kw_start, $matches);
 						preg_match('!\d+!', $matches[0], $sub_matches);
 						
 						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, $sub_matches[0]));
 					}
 					#Fall 2:
-					else if(preg_match('/ab[ ][0-9][0-9][.][ ]KW,[ ][0-9][0-9]', $kw_start) === 1){
+					else if(preg_match('/(ab[ ][0-9][0-9][.][ ]KW,[ ][0-9][0-9])/', $kw_start) === 1){
 						$posts = array_merge($posts, create_returning($modul_entry_start, 2, $year, $feiertage, NULL));
 					}
 					#Fall 1:
