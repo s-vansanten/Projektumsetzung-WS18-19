@@ -117,9 +117,8 @@
 	#			$date_string
 	#			$start_or_end - Variable (Wert 1 oder 2, kann auf true/false angepasst werden), der bestimmt, ob die Startzeit- oder Endzeit-Spalte zur Berechnugn des Timestamps verwendet wird
 	#			$csv - Array der Module, aus CSV importiert und formatiert
-	#			$wochentag - Wochentag-Kürzel, wird nur beim Sonderfall verwendet, dass in Sondertermin Angaben über wöchentliche Wiederholungen stehen
 	#			$year - Jahr
-	function setTimestamp ($row, $week, $date_string, $start_or_end, $csv, $year, $wochentag){
+	function setTimestamp ($row, $week, $date_string, $start_or_end, $csv, $year){
 				
 		#Routine zum Anpassen der Jahres-Zahl für Sondertermine von Januar bis Ende März
 		if($date_string != NULL){
@@ -153,33 +152,16 @@
 		}*/
 		
 		#Berechnen des Anfangs der Kalenderwoche über Kalenderwoche-Nummer
-		if($week != NULL){
+		if($date_string == NULL){
 			#Berechnung des Beginn einer Kalenderwoche, Montags 0:00 Uhr
 			$week_start = new DateTime();
 			$week_start->setISODate($year,$week);
 			
 			#Umformatierung in UNIX-Timestamp zur einfachen Aufaddierung von Sekunden
 			$date = strtotime($week_start->format('Y-m-d'));
-			
-			#Nachschauen, ob ein Wochentagskürzel gesetz wurde
-			if($wochentag != NULL){
-				if(strcmp($wochentag, "Mo") == 0){
-					$dayOfWeek = 1;
-				}else if(strcmp($wochentag, "Di") == 0){
-					$dayOfWeek = 2;
-				}else if(strcmp($wochentag, "Mi") == 0){
-					$dayOfWeek = 3;
-				}else if(strcmp($wochentag, "Do") == 0){
-					$dayOfWeek = 4;
-				}else if(strcmp($wochentag, "Fr") == 0){
-					$dayOfWeek = 5;
-				}else if(strcmp($wochentag, "Sa") == 0){
-					$dayOfWeek = 6;
-				}				
-			}
 		}
 		#Berechnung des Tages aus dem übergeben Datum
-		else if($date_string != NULL){
+		else if($week == NULL){
 			#Get weekday from date			
 			$date = strtotime($date_string."".$year);
 			$dayOfWeek = date("N", $date);
@@ -192,42 +174,42 @@
 		
 		#Bestimmung, ob $dayOfWeek geändert wurde und wenn ja auf welchen Wert oder welche Spalte mit Startzeiten einen Wert enthält, sollte $dayOfWeek unverändert sein
 		#$week_day beinhaltet wieviele Tage nach Montag der Timestamp gesetz werden soll
-		if($dayOfWeek == "1" OR ($csv[$row]['Mo B'] != NULL AND $wochentag == NULL)){
+		if($dayOfWeek == "1" OR $csv[$row]['Mo B'] != NULL){
 			$week_day = "0";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Mo B'];
 			}else if($start_or_end == "2"){
 				$time = $csv[$row]['Mo E'];
 			}
-		}else if($dayOfWeek == "2" OR ($csv[$row]['Di B'] != NULL AND $wochentag == NULL)){
+		}else if($dayOfWeek == "2" OR $csv[$row]['Di B'] != NULL){
 			$week_day = "1";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Di B'];
 			}else if($start_or_end == "2"){
 				$time = $csv[$row]['Di E'];
 			}
-		}else if($dayOfWeek == "3" OR ($csv[$row]['Mi B'] != NULL AND $wochentag == NULL)){
+		}else if($dayOfWeek == "3" OR $csv[$row]['Mi B'] != NULL){
 			$week_day = "2";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Mi B'];
 			}else if($start_or_end == "2"){
 				$time = $csv[$row]['Mi E'];
 			}
-		}else if($dayOfWeek == "4" OR ($csv[$row]['Do B'] != NULL AND $wochentag == NULL)){
+		}else if($dayOfWeek == "4" OR $csv[$row]['Do B'] != NULL){
 			$week_day = "3";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Do B'];
 			}else if($start_or_end == "2"){
 				$time = $csv[$row]['Do E'];
 			}
-		}else if($dayOfWeek == "5" OR ($csv[$row]['Fr B'] != NULL AND $wochentag == NULL)){
+		}else if($dayOfWeek == "5" OR $csv[$row]['Fr B'] != NULL){
 			$week_day = "4";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Fr B'];
 			}else if($start_or_end == "2"){
 				$time = $csv[$row]['Fr E'];
 			}
-		}else if($dayOfWeek == "6" OR ($csv[$row]['Sa B'] != NULL AND $wochentag == NULL)){
+		}else if($dayOfWeek == "6" OR $csv[$row]['Sa B'] != NULL){
 			$week_day = "5";
 			if($start_or_end == "1"){
 				$time = $csv[$row]['Sa B'];
@@ -348,6 +330,8 @@
 				
 				$modul_token = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];
 				
+				file_put_contents("test.txt", $modul_token.PHP_EOL, FILE_APPEND);
+				
 				#Überprüfen, ob für die Modul-Nummer schon ein ID gesetzt wurde
 				#Wenn ja, werdenen der ID sowie der dazugehörigen Farbe
 				#Wenn nicht, erhöhen des ID-Zählers
@@ -367,9 +351,12 @@
 					#Herausfiltern der Start-Kalenderwoche für die Timestamp-Funktion
 					preg_match('/([0-9][0-9])/', $kw_start, $kw_start_matches);
 					
+					print_r($kw_start_matches[0]);
+					echo "<br/>";
+					
 					$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];					
-					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year, NULL);
-					$end_time = setTimestamp($row, $kw_start_matches[0], NULL, "2", $csv, $year, NULL);
+					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year);
+					$end_time = setTimestamp($row, $kw_start_matches[0], NULL, "2", $csv, $year);
 					$location = $csv[$row]['Raum'];
 					$textColor = "black";
 					#Abfragen, ob auch in der Sondertermin-Spalte ein Wert steht
@@ -398,11 +385,7 @@
 					}
 					#Fall 2:
 					else if(preg_match('/(ab[ ][0-9][0-9][.][ ]KW,[ ][0-9][0-9])/', $kw_start) === 1){
-						
-						preg_match_all('/(ab[ ][0-9][0-9][.][ ]KW,[ ]([0-9][0-9]))/', $kw_start, $turnus_catch);
-						$turnus = $turnus_catch[2]/7;
-						
-						$posts = array_merge($posts, create_returning($modul_entry_start, $turnus, $year, $feiertage, NULL));
+						$posts = array_merge($posts, create_returning($modul_entry_start, 2, $year, $feiertage, NULL));
 					}
 					#Fall 1:
 					else{
@@ -427,23 +410,8 @@
 		start_create_ics($file_name);
 	}
 	
-	#Funktion zur 
-	#Input: 	$year - Jahr
-	#			$date - 
-	#Output: 	$year - 
-	function check_year($year, $date){
-		
-		preg_match_all('/[0-9][0-9]/', $date, $check_year_search);;
-		
-		if($check_year_search[0][1]<4){
-			$year++;
-		}
-		
-		return $year;
-	}
-	
 	#Funktion zur Erstellung von wöchentlichen oder mehr-wöchentlichen Terminen
-	#Input: 	$entry - Ersttermin-Events
+	#Input: 	$posts - Arrays aus Ersttermin-Events
 	#			$turnus - Gibt den Wochenturnus an
 	#			$year - Jahr
 	#			$feiertage - Feiertage für Berlin
@@ -453,6 +421,10 @@
 		
 		#Timestamp-Variable, welche das Ende der Vorlesungszeit setzt
 		global $end_lecture_time, $lecture_free_time_start, $lecture_free_time_end;
+		
+		echo "entry = <br/>";
+		print_r($entry);
+		echo "<br/>";
 		
 		#Array zum Abspeichern der Event-Einträge		
 		$returning_posts = array();
@@ -469,8 +441,25 @@
 		
 		#Das Ende des Modul wird durch das Ende der Vorlesungszeit gesetzt oder durch eine gesetzte Kalenderwoche
 		$end_modul_time = $end_lecture_time;		
-		if($end_kw != NULL){	
-			$end_modul_time = set_week_start_end($end_kw, $year, FALSE);
+		if($end_kw != NULL){			
+			#Überprüfung, ob die Kalenderwoche im nächsten Jahr liegt
+			#Kann im Wintersemester der Fall sein
+			#Wenn die Kalenderwoche kleiner 12 ist, sollte es sich in der Regel um das nächste Jahr handeln
+			#ALTERNATIV: Start-Termin wird um 4 Monate erhöht und das Jahr mit dem gesetzten Jahr überprüft
+			#$year != date("Y", $modul_start_date+10519200)
+			if($end_kw <= 12){
+				$end_kw_year = $year+1;
+			}else{
+				$end_kw_year = $year;
+			}			
+			
+			#end_kw wird um 1 erhöht, damit das Ende der Woche bestimmt wird
+			#Berechnung des Beginn einer Kalenderwoche, Montags 0:00 Uhr
+			$week_start = new DateTime();
+			$week_start->setISODate($end_kw_year,$end_kw+1);
+			
+			#Umformatierung in UNIX-Timestamp zur einfachen Aufaddierung von Sekunden
+			$end_modul_time = strtotime($week_start->format('Y-m-d'));
 		}
 			
 		while($end_modul_time > $modul_start_date){
@@ -479,44 +468,26 @@
 				#Check für Anpassung von Terminen durch Sondertermin-Spalte
 				#nicht 09.06., dafür 16.06.
 				if($entry['sonder_catch'] != NULL){
-					preg_match_all('/nicht(:)*( [0-9][0-9][.][0-9][0-9].,)+/', $entry['sonder_catch'] ,$sonder_catch_entries_nicht);
-					preg_match_all('/dafür(:)*( ([0-9][0-9][.][0-9][0-9].)(,)*( [0-9][0-9](:[0-9][0-9])* bis ([0-9][0-9] Uhr)*(,)*)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_dafuer);					
-										
-					if(!empty($sonder_catch_entries_nicht[0][0])){
-						preg_match_all('/([0-9][0-9][.][0-9][0-9].)/', $sonder_catch_entries_nicht[0][0],$sonder_catch_entries_nicht);
+					$sonder_catch_entries;
+					preg_match_all('/nicht [0-9][0-9][.][0-9][0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[0]);
+					preg_match_all('/dafür [0-9][0-9][.][0-9][0-9]/', $entry['sonder_catch'] ,$sonder_catch_entries[1]);
+					$sonder_catch_entries[0] = $sonder_catch_entries[0][0];
+					$sonder_catch_entries[1] = $sonder_catch_entries[1][0];				
+					
+					for($i = 0; $i < count($sonder_catch_entries[0]); $i++){
+						$sonder_catch_entries[0][$i] = preg_replace('/nicht /', '', $sonder_catch_entries[0][$i]);
 					}
-					if(!empty($sonder_catch_entries_dafuer[0][0])){
-						preg_match_all('/([0-9][0-9][.][0-9][0-9].)/', $sonder_catch_entries_dafuer[0][0],$sonder_catch_entries_dafuer);
+					for($i = 0; $i < count($sonder_catch_entries[1]); $i++){
+						$sonder_catch_entries[1][$i] = preg_replace('/dafür /', '', $sonder_catch_entries[1][$i]);
 					}
 					
-					for($i = 0; $i<count($sonder_catch_entries_nicht[0]); $i++){						
-						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries_nicht[0][$i]."".$year))){
+					for($i = 0; $i<count($sonder_catch_entries[0]); $i++){
+						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries[0][$i].".".$year))){
 							#FALL: nicht XX.XX , dafür YY.YY
-							if(!empty($sonder_catch_entries_dafuer[0][$i])){
-								
-								#FALL: dafür YY.YY AA bis BB Uhr
-								if(preg_match_all('/dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch']) != 0){
-									
-									preg_match_all('dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch'], $sonder_catch_entries_dafuer_time);
-									
-									preg_match('/[0-9][0-9](:[0-9][0-9])*/', $sonder_catch_entries_dafuer_time[14][0], $sonder_catch_entries_dafuer_time_start);
-									preg_match('/bis [0-9][0-9](:[0-9][0-9])*/', $sonder_catch_entries_dafuer_time[14][0], $sonder_catch_entries_dafuer_time_end);
-									if(!(preg_match('/[0-9][0-9]:[0-9][0-9]/', $sonder_catch_entries_dafuer_time_start[0])===1)){
-										$sonder_catch_entries_dafuer_time_start[0] =$sonder_catch_entries_dafuer_time_start[0].":00";
-									}
-									if(!(preg_match('/[0-9][0-9]:[0-9][0-9]/', $sonder_catch_entries_dafuer_time_end[0])===1)){
-										$sonder_catch_entries_dafuer_time_end[0] =$sonder_catch_entries_dafuer_time_end[0].":00";
-										$sonder_catch_entries_dafuer_time_end[0] = preg_replace('/bis /', '', $sonder_catch_entries_dafuer_time_end[0]);
-									}
-									
-									$new_modul_start_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".$sonder_catch_entries_dafuer_time_start[0]);
-									$new_modul_end_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".$sonder_catch_entries_dafuer_time_end[0]);
-									$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-								}else{
-									$new_modul_start_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".date("H:i", $modul_start_date));
-									$new_modul_end_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".date("H:i", $modul_end_date));
-									$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-								}
+							if(!empty($sonder_catch_entries[1])){
+								$new_modul_start_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_start_date));
+								$new_modul_end_date = strtotime($sonder_catch_entries[1][$i].".".$year." ".date("H:i", $modul_end_date));
+								$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 							}
 							#FALL: nicht XX.XX [ohne YY.YY]
 							else{
@@ -556,6 +527,11 @@
 		#Eintrag von Sonderterminen		
 		$sondertermine_plan_text = $csv[$row]['Sondertermine'];	
 		
+		#Funktion such nach dem verwendeten Datumsschema im Eintrag von Sonderterminen und speichert diese in einem Array
+		preg_match_all('/[0-9][0-9][.][0-9][0-9][.]/', $sondertermine_plan_text ,$sondertermine_array);
+		#Reduzierung des drei-dimensonalen Arrays in ein zwei-dimensonales Array 
+		$sondertermine_array = $sondertermine_array[0];
+		
 		#Array zum Abspeichern der Event-Einträge
 		$posts = array();
 		
@@ -565,121 +541,15 @@
 		$textColor = "black";
 		$location = $csv[$row]['Raum'];
 		
-		
-		#Filtern von Angabenen wöchentlicher Wiederholung in der Form: Mo: XX. KW bis YY. KW,
-		preg_match_all('/[A-Z][a-z]: ([0-9][0-9]. KW )bis ([0-9][0-9]. KW,)/', $sondertermine_plan_text, $sondertermine_returning);
-		
-		if(!empty($sondertermine_returning)){
-			
-			preg_match('/[A-Z][a-z]/', $sondertermine_returning[0][0], $wochentag);
-			preg_match('/[0-9][0-9]/', $sondertermine_returning[1][0], $kw_start);
-			preg_match('/[0-9][0-9]/', $sondertermine_returning[2][0], $kw_end);
-			
-			$start_time	= setTimestamp($row, $kw_start[0], NULL, "1", $csv, $year, $wochentag[0]);
-			$end_time	= setTimestamp($row, $kw_start[0], NULL, "2", $csv, $year, $wochentag[0]);
-			
-			#Löschen des Teils des Sondertermin-Strings, welcher schon verwendet wurde
-			$sonder_catch = str_replace($sondertermine_returning[0][0], '', $sondertermine_plan_text);
-			
-			#Herausfiltern von sonstigen Sonderterminen
-			preg_match_all('/[A-Z][a-z]:( [0-9][0-9].[0-9][0-9].(,)*)+/', $sonder_catch, $sondertermine_extracted);
-			preg_match_all('/[0-9][0-9].[0-9][0-9]./', $sondertermine_extracted[0][0], $sondertermine_array);
-			
-			#Löschen des Teils des Sondertermin-Strings, welcher schon verwendet wurde
-			$sonder_catch = str_replace($sondertermine_extracted[0][0], '', $sonder_catch);
-			
-			#Reduzierung des drei-dimensonalen Arrays in ein zwei-dimensonales Array 
-			$sondertermine_array = $sondertermine_array[0];
-			
-			#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
-			foreach ($sondertermine_array as $entry){
-				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL);
-				$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL);			
-				$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-			}			
-		
-			$modul_entry_start = array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'sonder_catch'=>$sonder_catch, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);			
-			
-			$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, NULL));
-		}
-		else{
-			#Funktion such nach dem verwendeten Datumsschema im Eintrag von Sonderterminen und speichert diese in einem Array
-			preg_match_all('/[0-9][0-9].[0-9][0-9]./', $sondertermine_plan_text ,$sondertermine_array);
-			#Reduzierung des drei-dimensonalen Arrays in ein zwei-dimensonales Array 
-			$sondertermine_array = $sondertermine_array[0];
-			
-			#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
-			foreach ($sondertermine_array as $entry){
-				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL);
-				$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL);			
-				$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-			}
-		}	
+		#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
+		foreach ($sondertermine_array as $entry){
+			$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year);
+			$end_time = setTimestamp($row, NULL, $entry, "2", $csv, $year);			
+			$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
+		}		
 		
 		#Rückgabe von Event-Einträgen
 		return $posts;		
-	}
-	
-	#Funktion zur 
-	#Input: 	$posts - Arrays aus Ersttermin-Events
-	#			$turnus - Gibt den Wochenturnus an
-	#			$year - Jahr
-	#			$feiertage - Feiertage für Berlin
-	#			$start_kw - Kalenderwoche, in der das Modul startet
-	#			$end_kw - Kalenderwoche, in der das Modul zuletzt staatfindet - NULL wenn das Modul bis zum Ende des Semesters läuft
-	#Output: 	$returning_posts - Array aus Events vom Beginn bis zum Ende des Semesters oder bis zu einer gesetzten Kalenderwoche
-	function create_returning_via_sondertermine($posts, $turnus, $year, $feiertage, $start_kw, $end_kw){
-		
-		#Timestamp-Variable, welche das Ende der Vorlesungszeit setzt
-		global $lecture_free_time_start, $lecture_free_time_end;
-		
-		#Array zum Abspeichern der Event-Einträge		
-		$returning_posts = array();
-		
-		#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format			
-		$modul_start_date = strtotime($entry['start']);
-		#Umformatierung des ISO8601-Timestamp in UNIX-Timestamp-Format
-		$modul_end_date = strtotime($entry['end']);
-		$title = $entry['title'];
-		$id = $entry['id'];
-		$color = $entry['color'];
-		$textColor = $entry['textColor'];
-		$location = $entry['location'];
-		
-		$end_modul_time = set_week_start_end($end_kw, $year, FALSE);
-		
-		
-	}
-	
-	#Funktion zur Erstellung von wöchentlichen oder mehr-wöchentlichen Terminen
-	#Input: 	$kw - Kalenderwoche
-	#			$year - Jahr
-	#			$start_or_end - Boolean - TRUE = start, FALSE = end
-	#Output: 	$timestamp - UNIX-Timestamp für den Start der Kalenderwoche
-	function set_week_start_end($kw, $year, $start_or_end){
-		#Überprüfung, ob die Kalenderwoche im nächsten Jahr liegt
-		#Kann im Wintersemester der Fall sein
-		#Wenn die Kalenderwoche kleiner 12 ist, sollte es sich in der Regel um das nächste Jahr handeln
-		#ALTERNATIV: Start-Termin wird um 4 Monate erhöht und das Jahr mit dem gesetzten Jahr überprüft
-		#$year != date("Y", $modul_start_date+10519200)
-		if($kw <= 12){
-			$kw_year = $year+1;
-		}else{
-			$kw_year = $year;
-		}			
-		
-		if(!$start_or_end){
-			$kw++;
-		}
-		
-		#Berechnung des Beginn einer Kalenderwoche, Montags 0:00 Uhr
-		$week_start = new DateTime();
-		$week_start->setISODate($kw_year,$kw);
-			
-		#Umformatierung in UNIX-Timestamp zur einfachen Aufaddierung von Sekunden
-		$timestamp = strtotime($week_start->format('Y-m-d'));
-		
-		return $timestamp;
 	}
 	
 	#Funktion zum Erstellen von Feiertags-Terminen
