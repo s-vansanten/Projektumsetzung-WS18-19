@@ -159,18 +159,24 @@
                 }
             } $pruefung = false ;
         }
-       
+        ?>
+     <div id="chalobox">
+         <?php
             // Checkbox
         //echo "Modulauswahl: <br>";
        
-        echo '<form  id= "chbox" method="post"> ';   
+        echo '<form  id= "chbox" name="chbox" method="post" action=""> ';   
         echo '<span id="chechboxUeberschrift">Wählen Sie Module aus :</span> <br>' ;
         for($i = 0; $i < count($idsWerte); $i++ ){                            //Wieviele Ids die gewählte Json-Datei hatte, soviele Checkboxen werden erzeugt.
-            echo  '<input type="checkbox" name="Modulauswahl[]" value="' . $i . '" />' . $alleTiteln[$i] . '<br>';     // und mit Titeln beschriftet.
+            echo  '<input type="checkbox" id= "Auswahlid" name="Modulauswahl[]" value="' . $i . '" />' . $alleTiteln[$i] . '<br>';     // und mit Titeln beschriftet.
         }
-        echo '<input type="submit" value="Auswählen" name="submit"  /> <br>' ;
+ 
+    // echo '<input type="button"  value="Submit" name="submit" class="submit"n/> <br>' ;
+      echo '<input type="submit"  value="Auswählen" name="submit" n/> <br>' ;
         echo '</form> <br>' ;
-       
+        ?>
+       </div>
+        <?php
         $ausgewaehlteIds ;
         if (isset($_POST["Modulauswahl"])){                // Es werden nur die gewählten ModulIds gespeichert.
             if ($_POST["Modulauswahl"]) {
@@ -202,8 +208,32 @@
         }
         }
     ?>
-          
-                   
+        <script>
+            $('#chbox').submit(function () {
+ 
+  e.preventDefault();
+ 
+ posting.done(function( data ) {
+            var content = $( data ).find( "#content" );
+            $( "#calendar" ).empty().append( content );
+        });
+});
+ /* $(document).ready(function () {
+    $('#chbox').on('submit', function(e) {
+        e.preventDefault();
+        
+        
+        $.ajax({
+            url : $(this).attr('action') || window.location.pathname,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (data) {
+              
+           
+        });
+    });
+});*/
+</script>
   
    <span id="navigationlink">Navigation:</span>
    <div id="divnavi">
@@ -278,8 +308,12 @@ function closeNav() {
                     firstDay: 1,
                     displayEventTime: false,
                     //Hier werden die einzelnen Events nicht wie bisher durch eine genaue .json aufgerufen ,sondern durch mein selectedFeed (aus dem dropdown)
+                  eventRender: function (event, element) {
+        element.attr('href', 'javascript:void(0);');
+    },
                   eventSources: [ {events: selectedFeed} ],
                     eventLimit: 5,
+                    
                   
                    //hab ein Theme (Blitzer)benutzt von https://jqueryui.com/themeroller/
                     themeSystem: 'jquery-ui',
@@ -287,7 +321,8 @@ function closeNav() {
                         left: 'prev,next today',
                         center: 'title',
                         right: 'month,agendaWeek,agendaDay,listWeek'
-                    },
+                            },
+                            
                 });
             //mit Hilfe aus :https://stackoverflow.com/questions/45794528/fullcalendar-event-filter-select-almost-working letzter Aufruf:13.11.2018 19:35
              $('#dropdown').change(onSelectChangeFeed);
@@ -305,6 +340,18 @@ function closeNav() {
                 //Übertragung feed auf selected feed, welches bei Eventsource benutzt wird
                 selectedFeed = feed;
                 }; 
+                
+                
+                $("#Auswahlid").change(function() {
+    if (this.checked) {
+        $('#calendar').fullCalendar('addEventSource', eventSourcec);
+    } else {
+        $('#calendar').fullCalendar('removeEventSource', eventSource);
+    }
+    $('#calendar').fullCalendar('rerenderEvents');
+});
+
+                
                
         </script>
                 
