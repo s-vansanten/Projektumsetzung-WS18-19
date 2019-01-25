@@ -143,7 +143,7 @@
 		#Überprüfung, ob die Kalenderwoche im nächsten Jahr liegt
 		#Kann im Wintersemester der Fall sein
 		#Wenn die Kalenderwoche kleiner 12 ist, sollte es sich in der Regel um das nächste Jahr handeln
-		if($week <= 12){
+		if($week != NULL AND $week <= 12){
 				$year++;
 		}
 		
@@ -396,7 +396,7 @@
 					#Fall 3: XX. KW bis YY. KW
 					
 					#Fall 3:
-					if(preg_match('/[0-9][0-9]. KW bis ([0-9][0-9]). KW/', $kw_start, $kw_end) === 1){
+					if(preg_match('/[0-9][0-9][.] KW bis ([0-9][0-9])[.] KW/', $kw_start, $kw_end) === 1){
 						
 						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, $kw_end[1]));
 					}
@@ -486,14 +486,14 @@
 				#nicht 09.06., dafür 16.06.
 				if($entry['sonder_catch'] != NULL){
 					
-					preg_match_all('/nicht(:)*( [0-9][0-9][.][0-9][0-9].(,)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_nicht);
-					preg_match_all('/dafür(:)*( ([0-9][0-9][.][0-9][0-9].)(,)*( [0-9][0-9](:[0-9][0-9])* bis ([0-9][0-9] Uhr)*(,)*)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_dafuer);					
+					preg_match_all('/nicht(:)*( [0-9][0-9][.][0-9][0-9][.](,)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_nicht);
+					preg_match_all('/dafür(:)*( ([0-9][0-9][.][0-9][0-9][.])(,)*( [0-9][0-9](:[0-9][0-9])* bis ([0-9][0-9] Uhr)*(,)*)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_dafuer);					
 										
 					if(!empty($sonder_catch_entries_nicht[0][0])){
-						preg_match_all('/([0-9][0-9][.][0-9][0-9].)/', $sonder_catch_entries_nicht[0][0],$sonder_catch_entries_nicht);
+						preg_match_all('/([0-9][0-9][.][0-9][0-9][.])/', $sonder_catch_entries_nicht[0][0],$sonder_catch_entries_nicht);
 					}
 					if(!empty($sonder_catch_entries_dafuer[0][0])){
-						preg_match_all('/([0-9][0-9][.][0-9][0-9].)/', $sonder_catch_entries_dafuer[0][0],$sonder_catch_entries_dafuer);
+						preg_match_all('/([0-9][0-9][.][0-9][0-9][.])/', $sonder_catch_entries_dafuer[0][0],$sonder_catch_entries_dafuer);
 					}						
 					
 					for($i = 0; $i<count($sonder_catch_entries_nicht[0]); $i++){
@@ -503,9 +503,9 @@
 							if(!empty($sonder_catch_entries_dafuer[0][$i])){
 								
 								#FALL: dafür YY.YY AA bis BB Uhr
-								if(preg_match_all('/dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch']) != 0){
+								if(preg_match_all('/dafür(:)*( ([0-9][0-9][.][0-9][0-9][.])*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9][.][0-9][0-9][.])*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch']) != 0){
 									
-									preg_match_all('/dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch'], $sonder_catch_entries_dafuer_time);
+									preg_match_all('/dafür(:)*( ([0-9][0-9][.][0-9][0-9][.])*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9][.][0-9][0-9][.])*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch'], $sonder_catch_entries_dafuer_time);
 									
 									preg_match('/[0-9][0-9](:[0-9][0-9])*/', $sonder_catch_entries_dafuer_time[14][0], $sonder_catch_entries_dafuer_time_start);
 									preg_match('/bis [0-9][0-9](:[0-9][0-9])*/', $sonder_catch_entries_dafuer_time[14][0], $sonder_catch_entries_dafuer_time_end);
@@ -584,7 +584,7 @@
 		
 		
 		#Filtern von Angabenen wöchentlicher Wiederholung in der Form: Mo: XX. KW bis YY. KW,
-		preg_match_all('/[A-Z][a-z]: ([0-9][0-9]. KW )bis ([0-9][0-9]. KW,)/', $sondertermine_plan_text, $sondertermine_returning);
+		preg_match_all('/[A-Z][a-z]: ([0-9][0-9][.] KW )bis ([0-9][0-9][.] KW,)/', $sondertermine_plan_text, $sondertermine_returning);		
 		
 		if(!empty($sondertermine_returning[0])){
 			
@@ -599,8 +599,8 @@
 			$sonder_catch = str_replace($sondertermine_returning[0][0], '', $sondertermine_plan_text);
 			
 			#Herausfiltern von sonstigen Sonderterminen
-			preg_match_all('/[A-Z][a-z]:( [0-9][0-9].[0-9][0-9].(,)*)+/', $sonder_catch, $sondertermine_extracted);
-			preg_match_all('/[0-9][0-9].[0-9][0-9]./', $sondertermine_extracted[0][0], $sondertermine_array);
+			preg_match_all('/[A-Z][a-z]:( [0-9][0-9][.][0-9][0-9][.](,)*)+/', $sonder_catch, $sondertermine_extracted);
+			preg_match_all('/[0-9][0-9][.][0-9][0-9][.]/', $sondertermine_extracted[0][0], $sondertermine_array);
 			
 			#Löschen des Teils des Sondertermin-Strings, welcher schon verwendet wurde
 			$sonder_catch = str_replace($sondertermine_extracted[0][0], '', $sonder_catch);
@@ -621,14 +621,12 @@
 		}
 		else{
 			#Funktion such nach dem verwendeten Datumsschema im Eintrag von Sonderterminen und speichert diese in einem Array
-			preg_match_all('/[0-9][0-9].[0-9][0-9]./', $sondertermine_plan_text ,$sondertermine_array);
+			preg_match_all('/([0-9][0-9][.][0-9][0-9][.])/', $sondertermine_plan_text ,$sondertermine_array);
 			#Reduzierung des drei-dimensonalen Arrays in ein zwei-dimensonales Array 
-			$sondertermine_array = $sondertermine_array[0];
+			$sondertermine_array = $sondertermine_array[0];			
 			
 			#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
 			foreach ($sondertermine_array as $entry){
-				
-				
 				
 				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL, NULL);
 				if(preg_match('/'.$entry.' bis ([0-9][0-9]:[0-9][0-9])/', $sondertermine_plan_text, $sondertermin_direct_time) === 1){
