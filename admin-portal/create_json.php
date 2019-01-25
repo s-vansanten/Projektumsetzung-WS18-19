@@ -400,7 +400,7 @@
 					else if(preg_match('/(ab[ ][0-9][0-9][.][ ]KW,[ ][0-9][0-9])/', $kw_start) === 1){
 						
 						preg_match_all('/(ab[ ][0-9][0-9][.][ ]KW,[ ]([0-9][0-9]))/', $kw_start, $turnus_catch);
-						$turnus = $turnus_catch[2]/7;
+						$turnus = $turnus_catch[2][0]/7;
 						
 						$posts = array_merge($posts, create_returning($modul_entry_start, $turnus, $year, $feiertage, NULL));
 					}
@@ -497,7 +497,7 @@
 								#FALL: dafür YY.YY AA bis BB Uhr
 								if(preg_match_all('/dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch']) != 0){
 									
-									preg_match_all('dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch'], $sonder_catch_entries_dafuer_time);
+									preg_match_all('/dafür(:)*( ([0-9][0-9].[0-9][0-9].)*(,)*( )*([0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*(,)*)*( '.$sonder_catch_entries_dafuer[0][$i].'(,)*( [0-9][0-9].[0-9][0-9].)*(,)*( [0-9][0-9](:[0-9][0-9])* bis [0-9][0-9](:[0-9][0-9])* Uhr)*)/', $entry['sonder_catch'], $sonder_catch_entries_dafuer_time);
 									
 									preg_match('/[0-9][0-9](:[0-9][0-9])*/', $sonder_catch_entries_dafuer_time[14][0], $sonder_catch_entries_dafuer_time_start);
 									preg_match('/bis [0-9][0-9](:[0-9][0-9])*/', $sonder_catch_entries_dafuer_time[14][0], $sonder_catch_entries_dafuer_time_end);
@@ -569,7 +569,7 @@
 		#Filtern von Angabenen wöchentlicher Wiederholung in der Form: Mo: XX. KW bis YY. KW,
 		preg_match_all('/[A-Z][a-z]: ([0-9][0-9]. KW )bis ([0-9][0-9]. KW,)/', $sondertermine_plan_text, $sondertermine_returning);
 		
-		if(!empty($sondertermine_returning)){
+		if(!empty($sondertermine_returning[0])){
 			
 			preg_match('/[A-Z][a-z]/', $sondertermine_returning[0][0], $wochentag);
 			preg_match('/[0-9][0-9]/', $sondertermine_returning[1][0], $kw_start);
