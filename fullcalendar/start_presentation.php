@@ -21,7 +21,7 @@
                     <option value="Semester" data-feed=""selected>Semester wählen</option>
                      <?php
 					#https://www.tutdepot.com/create-a-select-menu-from-files-or-directory/					
-					$dir =  "../admin-portal/events/";
+					$dir =  "../admin-portal/public/";
 					$handle = opendir($dir);
 					while (false !== ($file = readdir($handle))) {
 						$files[] = $file;
