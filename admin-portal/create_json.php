@@ -15,6 +15,8 @@
 	
 	include 'create_ics.php';
 	
+	date_default_timezone_set('Europe/Berlin');
+	
 	#Ordner zum Abspeichern der JSON-Dateien
 	$events_dir = "events/";
 	
@@ -353,7 +355,7 @@
 			if($csv[$row]['Sem'] == $stud_sem['Sem']){
 				$kw_start = $csv[$row]['LV-Start'];				
 				
-				$modul_token = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];
+				$modul_token = $csv[$row]['Modul']." ".$csv[$row]['Art']." Gruppe ".$csv[$row]['Stud-Gr'];
 				
 				#Überprüfen, ob für die Modul-Nummer schon ein ID gesetzt wurde
 				#Wenn ja, werdenen der ID sowie der dazugehörigen Farbe
@@ -374,7 +376,7 @@
 					#Herausfiltern der Start-Kalenderwoche für die Timestamp-Funktion
 					preg_match('/([0-9][0-9])/', $kw_start, $kw_start_matches);
 					
-					$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];					
+					$title = $csv[$row]['Modul']." ".$csv[$row]['Art']." Gruppe ".$csv[$row]['Stud-Gr'];					
 					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year, NULL, NULL);
 					$end_time = setTimestamp($row, $kw_start_matches[0], NULL, "2", $csv, $year, NULL, NULL);
 					$location = $csv[$row]['Raum'];
@@ -393,15 +395,10 @@
 					#Fall 2: ab XX. KW, XX-tätig
 					#Fall 3: XX. KW bis YY. KW
 					
-					
 					#Fall 3:
-					if(preg_match('/([0-9][0-9][.][ ]KW[ ]bis[ ][0-9][0-9][.][ ]KW)/', $kw_start) === 1){
+					if(preg_match('/[0-9][0-9]. KW bis ([0-9][0-9]). KW/', $kw_start, $kw_end) === 1){
 						
-						#Herausfiltern der zweiten genannten Kalenderwoche aus LV-Start
-						preg_match('/(bis[ ][0-9][0-9][.][ ]KW)/', $kw_start, $matches);
-						preg_match('!\d+!', $matches[0], $sub_matches);
-						
-						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, $sub_matches[0]));
+						$posts = array_merge($posts, create_returning($modul_entry_start, 1, $year, $feiertage, $kw_end[1]));
 					}
 					#Fall 2:
 					else if(preg_match('/(ab[ ][0-9][0-9][.][ ]KW,[ ][0-9][0-9])/', $kw_start) === 1){
@@ -481,12 +478,15 @@
 		}
 			
 		while($end_modul_time > $modul_start_date){
+			$for_check = FALSE;
+			
 			#Check von Feiertagen & Check vorlesungsfreier Zeit
 			if(!in_array(date("Y-m-d", $modul_start_date), $feiertage) && !($modul_start_date>$lecture_free_time_start && $modul_start_date<$lecture_free_time_end+86400)){
 				#Check für Anpassung von Terminen durch Sondertermin-Spalte
 				#nicht 09.06., dafür 16.06.
 				if($entry['sonder_catch'] != NULL){
-					preg_match_all('/nicht(:)*( [0-9][0-9][.][0-9][0-9].,)+/', $entry['sonder_catch'] ,$sonder_catch_entries_nicht);
+					
+					preg_match_all('/nicht(:)*( [0-9][0-9][.][0-9][0-9].(,)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_nicht);
 					preg_match_all('/dafür(:)*( ([0-9][0-9][.][0-9][0-9].)(,)*( [0-9][0-9](:[0-9][0-9])* bis ([0-9][0-9] Uhr)*(,)*)*)+/', $entry['sonder_catch'] ,$sonder_catch_entries_dafuer);					
 										
 					if(!empty($sonder_catch_entries_nicht[0][0])){
@@ -494,10 +494,11 @@
 					}
 					if(!empty($sonder_catch_entries_dafuer[0][0])){
 						preg_match_all('/([0-9][0-9][.][0-9][0-9].)/', $sonder_catch_entries_dafuer[0][0],$sonder_catch_entries_dafuer);
-					}
+					}						
 					
-					for($i = 0; $i<count($sonder_catch_entries_nicht[0]); $i++){						
-						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries_nicht[0][$i]."".$year))){
+					for($i = 0; $i<count($sonder_catch_entries_nicht[0]); $i++){
+						
+						if(date("d-m-Y", $modul_start_date) == date("d-m-Y", strtotime($sonder_catch_entries_nicht[0][$i]."".$year))){							
 							#FALL: nicht XX.XX , dafür YY.YY
 							if(!empty($sonder_catch_entries_dafuer[0][$i])){
 								
@@ -519,32 +520,41 @@
 									$new_modul_start_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".$sonder_catch_entries_dafuer_time_start[0]);
 									$new_modul_end_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".$sonder_catch_entries_dafuer_time_end[0]);
 									$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-								}else{
-									$new_modul_start_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".date("H:i", $modul_start_date));
-									$new_modul_end_date = strtotime($sonder_catch_entries_dafuer[0][$i]."".check_year($year, $sonder_catch_entries_dafuer[0][$i])." ".date("H:i", $modul_end_date));
-									$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $new_modul_start_date),'end'=>date(DATE_ISO8601, $new_modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
+									$for_check = TRUE;
 								}
 							}
 							#FALL: nicht XX.XX [ohne YY.YY]
 							else{
-								#nichts tun
+								#nichts tun	
+								$for_check = TRUE;
 							}
-						}else{
-							$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 						}
+					}
+					
+					if($for_check == FALSE){
+						$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 					}
 				}else{
 					$returning_posts[] = array('title'=> $title,'start'=>date(DATE_ISO8601, $modul_start_date),'end'=>date(DATE_ISO8601, $modul_end_date), 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
-				}								
-			}			
+				}				
+			}
+
+			#Routine zur Einkalkulierung der Zeitumstellung
+			if($modul_start_date < strtotime('last Sunday of October '.$year) AND $modul_start_date+604800*$turnus > strtotime('last Sunday of October '.$year)){
+				$modul_start_date += 3600;
+				$modul_end_date += 3600;
+			}else if($modul_start_date < strtotime('last Sunday of March '.$year) AND $modul_start_date+604800*$turnus > strtotime('last Sunday of March '.$year)){
+				$modul_start_date -= 3600;
+				$modul_end_date -= 3600;
+			}		
 			
 			#Erhöhung des Timestamp um (Sekunden pro Woche)*Turnus
 			$modul_start_date += 604800*$turnus;
-			$modul_end_date += 604800*$turnus;
+			$modul_end_date += 604800*$turnus;			
 		}
 		
 		#Rückgabe von Event-Einträgen
-		return $returning_posts;
+		return $returning_posts;		
 	}
 	
 	#Funktion zum Erstellen von Terminen anhand der angebenen Sondertermine
@@ -567,7 +577,7 @@
 		$posts = array();
 		
 		#Titel-Deklaration des Moduls
-		$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];
+		$title = $csv[$row]['Modul']." ".$csv[$row]['Art']." Gruppe ".$csv[$row]['Stud-Gr'];
 		$color = $color_array[$id];
 		$textColor = "black";
 		$location = $csv[$row]['Raum'];
@@ -621,7 +631,7 @@
 				
 				
 				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL, NULL);
-				if(preg_match('/'.$entry' bis ([0-9][0-9]:[0-9][0-9])/', $sondertermine_plan_text, $sondertermin_direct_time) === 1){
+				if(preg_match('/'.$entry.' bis ([0-9][0-9]:[0-9][0-9])/', $sondertermine_plan_text, $sondertermin_direct_time) === 1){
 					$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL, $sondertermin_direct_time[1][0]);
 				}else{
 					$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL, NULL);
