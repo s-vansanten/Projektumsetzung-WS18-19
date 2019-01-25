@@ -117,9 +117,11 @@
 	#			$date_string
 	#			$start_or_end - Variable (Wert 1 oder 2, kann auf true/false angepasst werden), der bestimmt, ob die Startzeit- oder Endzeit-Spalte zur Berechnugn des Timestamps verwendet wird
 	#			$csv - Array der Module, aus CSV importiert und formatiert
-	#			$wochentag - Wochentag-Kürzel, wird nur beim Sonderfall verwendet, dass in Sondertermin Angaben über wöchentliche Wiederholungen stehen
 	#			$year - Jahr
-	function setTimestamp ($row, $week, $date_string, $start_or_end, $csv, $year, $wochentag){
+	#			$wochentag - Wochentag-Kürzel, wird nur beim Sonderfall verwendet, dass in Sondertermin Angaben über wöchentliche Wiederholungen stehen
+	#			$direct_time - Uhrzeitangabe aus Sondertermine
+	#Output:	
+	function setTimestamp ($row, $week, $date_string, $start_or_end, $csv, $year, $wochentag, $direct_time){
 				
 		#Routine zum Anpassen der Jahres-Zahl für Sondertermine von Januar bis Ende März
 		if($date_string != NULL){
@@ -190,50 +192,55 @@
 			return;
 		}		
 		
-		#Bestimmung, ob $dayOfWeek geändert wurde und wenn ja auf welchen Wert oder welche Spalte mit Startzeiten einen Wert enthält, sollte $dayOfWeek unverändert sein
-		#$week_day beinhaltet wieviele Tage nach Montag der Timestamp gesetz werden soll
-		if($dayOfWeek == "1" OR ($csv[$row]['Mo B'] != NULL AND $wochentag == NULL)){
-			$week_day = "0";
-			if($start_or_end == "1"){
-				$time = $csv[$row]['Mo B'];
-			}else if($start_or_end == "2"){
-				$time = $csv[$row]['Mo E'];
+		if($direct_time == NULL){
+			#Bestimmung, ob $dayOfWeek geändert wurde und wenn ja auf welchen Wert oder welche Spalte mit Startzeiten einen Wert enthält, sollte $dayOfWeek unverändert sein
+			#$week_day beinhaltet wieviele Tage nach Montag der Timestamp gesetz werden soll
+			if($dayOfWeek == "1" OR ($csv[$row]['Mo B'] != NULL AND $wochentag == NULL)){
+				$week_day = "0";
+				if($start_or_end == "1"){
+					$time = $csv[$row]['Mo B'];
+				}else if($start_or_end == "2"){
+					$time = $csv[$row]['Mo E'];
+				}
+			}else if($dayOfWeek == "2" OR ($csv[$row]['Di B'] != NULL AND $wochentag == NULL)){
+				$week_day = "1";
+				if($start_or_end == "1"){
+					$time = $csv[$row]['Di B'];
+				}else if($start_or_end == "2"){
+					$time = $csv[$row]['Di E'];
+				}
+			}else if($dayOfWeek == "3" OR ($csv[$row]['Mi B'] != NULL AND $wochentag == NULL)){
+				$week_day = "2";
+				if($start_or_end == "1"){
+					$time = $csv[$row]['Mi B'];
+				}else if($start_or_end == "2"){
+					$time = $csv[$row]['Mi E'];
+				}
+			}else if($dayOfWeek == "4" OR ($csv[$row]['Do B'] != NULL AND $wochentag == NULL)){
+				$week_day = "3";
+				if($start_or_end == "1"){
+					$time = $csv[$row]['Do B'];
+				}else if($start_or_end == "2"){
+					$time = $csv[$row]['Do E'];
+				}
+			}else if($dayOfWeek == "5" OR ($csv[$row]['Fr B'] != NULL AND $wochentag == NULL)){
+				$week_day = "4";
+				if($start_or_end == "1"){
+					$time = $csv[$row]['Fr B'];
+				}else if($start_or_end == "2"){
+					$time = $csv[$row]['Fr E'];
+				}
+			}else if($dayOfWeek == "6" OR ($csv[$row]['Sa B'] != NULL AND $wochentag == NULL)){
+				$week_day = "5";
+				if($start_or_end == "1"){
+					$time = $csv[$row]['Sa B'];
+				}else if($start_or_end == "2"){
+					$time = $csv[$row]['Sa E'];
+				}
 			}
-		}else if($dayOfWeek == "2" OR ($csv[$row]['Di B'] != NULL AND $wochentag == NULL)){
-			$week_day = "1";
-			if($start_or_end == "1"){
-				$time = $csv[$row]['Di B'];
-			}else if($start_or_end == "2"){
-				$time = $csv[$row]['Di E'];
-			}
-		}else if($dayOfWeek == "3" OR ($csv[$row]['Mi B'] != NULL AND $wochentag == NULL)){
-			$week_day = "2";
-			if($start_or_end == "1"){
-				$time = $csv[$row]['Mi B'];
-			}else if($start_or_end == "2"){
-				$time = $csv[$row]['Mi E'];
-			}
-		}else if($dayOfWeek == "4" OR ($csv[$row]['Do B'] != NULL AND $wochentag == NULL)){
-			$week_day = "3";
-			if($start_or_end == "1"){
-				$time = $csv[$row]['Do B'];
-			}else if($start_or_end == "2"){
-				$time = $csv[$row]['Do E'];
-			}
-		}else if($dayOfWeek == "5" OR ($csv[$row]['Fr B'] != NULL AND $wochentag == NULL)){
-			$week_day = "4";
-			if($start_or_end == "1"){
-				$time = $csv[$row]['Fr B'];
-			}else if($start_or_end == "2"){
-				$time = $csv[$row]['Fr E'];
-			}
-		}else if($dayOfWeek == "6" OR ($csv[$row]['Sa B'] != NULL AND $wochentag == NULL)){
-			$week_day = "5";
-			if($start_or_end == "1"){
-				$time = $csv[$row]['Sa B'];
-			}else if($start_or_end == "2"){
-				$time = $csv[$row]['Sa E'];
-			}
+		}else{
+			$direct_time = str_replace(':', '.', $direct_time);
+			$time = $direct_time;
 		}
 		
 		#Splitten der Zahl aus der Zeitspalte
@@ -368,8 +375,8 @@
 					preg_match('/([0-9][0-9])/', $kw_start, $kw_start_matches);
 					
 					$title = $csv[$row]['Modul']." ".utf8_encode($csv[$row]['Art'])." Gruppe ".$csv[$row]['Stud-Gr'];					
-					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year, NULL);
-					$end_time = setTimestamp($row, $kw_start_matches[0], NULL, "2", $csv, $year, NULL);
+					$start_time	= setTimestamp($row, $kw_start_matches[0], NULL, "1", $csv, $year, NULL, NULL);
+					$end_time = setTimestamp($row, $kw_start_matches[0], NULL, "2", $csv, $year, NULL, NULL);
 					$location = $csv[$row]['Raum'];
 					$textColor = "black";
 					#Abfragen, ob auch in der Sondertermin-Spalte ein Wert steht
@@ -575,8 +582,8 @@
 			preg_match('/[0-9][0-9]/', $sondertermine_returning[1][0], $kw_start);
 			preg_match('/[0-9][0-9]/', $sondertermine_returning[2][0], $kw_end);
 			
-			$start_time	= setTimestamp($row, $kw_start[0], NULL, "1", $csv, $year, $wochentag[0]);
-			$end_time	= setTimestamp($row, $kw_start[0], NULL, "2", $csv, $year, $wochentag[0]);
+			$start_time	= setTimestamp($row, $kw_start[0], NULL, "1", $csv, $year, $wochentag[0], NULL);
+			$end_time	= setTimestamp($row, $kw_start[0], NULL, "2", $csv, $year, $wochentag[0], NULL);
 			
 			#Löschen des Teils des Sondertermin-Strings, welcher schon verwendet wurde
 			$sonder_catch = str_replace($sondertermine_returning[0][0], '', $sondertermine_plan_text);
@@ -593,8 +600,8 @@
 			
 			#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
 			foreach ($sondertermine_array as $entry){
-				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL);
-				$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL);			
+				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL, NULL);
+				$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL, NULL);			
 				$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 			}			
 		
@@ -610,8 +617,15 @@
 			
 			#Iteration über alle gefunden Sondertermine und dabei Erstellung des Events-Eintrag für den Sondertermin
 			foreach ($sondertermine_array as $entry){
-				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL);
-				$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL);			
+				
+				
+				
+				$start_time	= setTimestamp($row, NULL, $entry, "1", $csv, $year, NULL, NULL);
+				if(preg_match('/'.$entry' bis ([0-9][0-9]:[0-9][0-9])/', $sondertermine_plan_text, $sondertermin_direct_time) === 1){
+					$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL, $sondertermin_direct_time[1][0]);
+				}else{
+					$end_time 	= setTimestamp($row, NULL, $entry, "2", $csv, $year, NULL, NULL);
+				}					
 				$posts[]= array('title'=> $title,'start'=>$start_time,'end'=>$end_time, 'id'=>$id, 'color'=>$color, 'textColor'=>$textColor, 'location'=>$location);
 			}
 		}	
